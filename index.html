@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kertas Acara GMAHK BSD</title>
 
     <!-- Bootstrap -->
@@ -14,22 +15,22 @@
 
 <body class="bg-white">
 
-    <div class="container py-5">
-        <div class="text-center mb-4">
-            <img src="GMAHK BSD.png" alt="GMAHK BSD" class="mx-auto mb-3" style="max-width: 200px;">
-            <h1 class="text-3xl font-bold">Kertas Acara GMAHK BSD</h1>
-            <h2 class="text-xl text-gray-700 mt-2" id="scheduleDate">Loading...</h2>
-            <p class="text-gray-500 text-sm" id="lastUpdated">Loading...</p>
+    <div class="container py-3 py-md-5 px-3">
+        <div class="text-center mb-3 mb-md-4">
+            <img src="GMAHK BSD.png" alt="GMAHK BSD" class="mx-auto mb-2 mb-md-3" style="max-width: 150px;">
+            <h1 class="font-bold" style="font-size: 1.5rem;">Kertas Acara GMAHK BSD</h1>
+            <h2 class="text-gray-700 mt-1 mt-md-2" style="font-size: 1.1rem;" id="scheduleDate">Loading...</h2>
+            <p class="text-gray-500" style="font-size: 0.75rem;" id="lastUpdated">Loading...</p>
         </div>
 
         <div id="scheduleContainer">
-            <div class="mb-4">
+            <div class="mb-3 mb-md-4">
                 <ul id="ssDewaساList" class="list-group list-group-flush"></ul>
             </div>
-            <div class="mb-4">
+            <div class="mb-3 mb-md-4">
                 <ul id="khotbahList" class="list-group list-group-flush"></ul>
             </div>
-            <div class="mb-4">
+            <div class="mb-3 mb-md-4">
                 <ul id="pelayananList" class="list-group list-group-flush"></ul>
             </div>
         </div>
@@ -58,27 +59,22 @@
         }
 
         fetch(SHEET_URL)
-            .then(res => {
-                // Get last modified time from response headers
-                const lastModified = res.headers.get('Last-Modified');
-                if (lastModified) {
-                    const modifiedDate = new Date(lastModified);
-                    const timeString = modifiedDate.toLocaleString('en-GB', { 
-                        day: '2-digit', 
-                        month: 'short', 
-                        year: 'numeric', 
-                        hour: '2-digit', 
-                        minute: '2-digit',
-                        hour12: false 
-                    });
-                    document.getElementById("lastUpdated").textContent = `Last updated: ${timeString}`;
-                }
-                return res.text();
-            })
+            .then(res => res.text())
             .then(text => {
                 const json = JSON.parse(text.substring(47, text.length - 2));
                 const rows = json.table.rows;
-                const list = document.getElementById("scheduleList");
+
+                // Update timestamp when data is fetched
+                const now = new Date();
+                const timeString = now.toLocaleString('en-GB', { 
+                    day: '2-digit', 
+                    month: 'short', 
+                    year: 'numeric', 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: false 
+                });
+                document.getElementById("lastUpdated").textContent = `Data partisipan diambil pada: ${timeString}`;
 
                 // Debug: log the data structure
                 console.log("Total rows:", rows.length);
@@ -126,14 +122,14 @@
                 const pelayananList = document.getElementById("pelayananList");
 
                 // Add headers for each section
-                ssDewaساList.innerHTML = `<li class='list-group-item bg-primary text-white'>
-                    <h4 class="font-bold mb-0">SS DEWASA</h4>
+                ssDewaساList.innerHTML = `<li class='list-group-item bg-white text-center border-0 border-bottom py-2' style='border-bottom: 1px solid #dee2e6 !important;'>
+                    <h4 class="font-bold mb-0" style="color: #2e6ce8; font-size: 1rem;">SS DEWASA</h4>
                 </li>`;
-                khotbahList.innerHTML = `<li class='list-group-item bg-primary text-white'>
-                    <h4 class="font-bold mb-0">KHOTBAH</h4>
+                khotbahList.innerHTML = `<li class='list-group-item bg-white text-center border-0 border-bottom py-2' style='border-bottom: 1px solid #dee2e6 !important;'>
+                    <h4 class="font-bold mb-0" style="color: #2e6ce8; font-size: 1rem;">KHOTBAH</h4>
                 </li>`;
-                pelayananList.innerHTML = `<li class='list-group-item bg-primary text-white'>
-                    <h4 class="font-bold mb-0">PELAYANAN MUSIK</h4>
+                pelayananList.innerHTML = `<li class='list-group-item bg-white text-center border-0 border-bottom py-2' style='border-bottom: 1px solid #dee2e6 !important;'>
+                    <h4 class="font-bold mb-0" style="color: #2e6ce8; font-size: 1rem;">PELAYANAN MUSIK</h4>
                 </li>`;
 
                 let currentSection = null;
@@ -163,9 +159,9 @@
                     if (!role || !person) continue;
 
                     const item = document.createElement("li");
-                    item.className = "list-group-item";
+                    item.className = "list-group-item border-0 py-2 px-3";
                     item.innerHTML = `
-                        <div class="flex justify-between items-center">
+                        <div class="flex justify-between items-center" style="font-size: 0.9rem;">
                             <span class="font-semibold text-gray-700">${role}</span>
                             <span class="text-gray-900">${person}</span>
                         </div>
