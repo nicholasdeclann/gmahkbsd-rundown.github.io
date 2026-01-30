@@ -8,6 +8,9 @@
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -19,8 +22,14 @@
         <div class="text-center mb-3 mb-md-4">
             <img src="GMAHK BSD.png" alt="GMAHK BSD" class="mx-auto mb-2 mb-md-3" style="max-width: 150px;">
             <h1 class="font-bold" style="font-size: 1.5rem;">Kertas Acara GMAHK BSD</h1>
-            <h2 class="text-gray-700 mt-1 mt-md-2" style="font-size: 1.1rem;" id="scheduleDate">Memuat...</h2>
-            <p class="text-gray-500" style="font-size: 0.75rem;" id="lastUpdated">Memuat...</p>
+            <h2 class="text-gray-700 mt-1 mt-md-2" style="font-size: 1.1rem;" id="scheduleDate"><i class="bi bi-arrow-clockwise" style="animation: spin 1s linear infinite;"></i></h2>
+            <p class="text-gray-500" style="font-size: 0.75rem;" id="lastUpdated"></p>
+            <style>
+                @keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+            </style>
         </div>
 
         <div id="scheduleContainer">
@@ -42,6 +51,10 @@
     <script>
         const SHEET_ID = "1P4tHksUSd-cYVcU-mYQYvutL-c1S-V2Nj1hlb-yR28w";
         const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+        
+        const SHEET_ID_2 = "1uW-CwZxGJ9Jfqv78pUc-4iE9fqgrV17eV9Ws_FEE5Ns";
+        const KERTAS_ACARA_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID_2}/gviz/tq?tqx=out:json&gid=1587228396`;
+        const LAGU_SION_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID_2}/gviz/tq?tqx=out:json&gid=1174681408`;
 
         // Get this week's Saturday
         function getThisWeeksSaturday() {
@@ -77,6 +90,49 @@
             
             return saturdayNumber;
         }
+
+        // Fetch Lagu Sion data and create lookup map
+        let laguSionMap = {};
+        
+        Promise.all([
+            fetch(LAGU_SION_URL).then(res => res.text()),
+            fetch(KERTAS_ACARA_URL).then(res => res.text()),
+            fetch(SHEET_URL).then(res => res.text())
+        ]).then(([laguSionText, kertasAcaraText, sheetText]) => {
+            // Parse Lagu Sion data
+            const laguSionJson = JSON.parse(laguSionText.substring(47, laguSionText.length - 2));
+            const laguSionRows = laguSionJson.table.rows;
+            
+            // Build Lagu Sion lookup map
+            for (let row of laguSionRows) {
+                if (!row.c) continue;
+                const num = row.c[1]?.v;
+                const title = row.c[2]?.v;
+                if (num && title) {
+                    laguSionMap[num] = title;
+                }
+            }
+            
+            // Parse Kertas Acara data to get lagu buka and lagu tutup
+            const kertasAcaraJson = JSON.parse(kertasAcaraText.substring(47, kertasAcaraText.length - 2));
+            const kertasAcaraRows = kertasAcaraJson.table.rows;
+            
+            let laguBukaNum = null;
+            let laguTutupNum = null;
+            
+            // Find lagu buka and lagu tutup from the kertas acara sheet
+            for (let row of kertasAcaraRows) {
+                if (!row.c) continue;
+                const label = row.c[0]?.v || "";
+                if (label.toLowerCase().includes("lagu buka")) {
+                    laguBukaNum = row.c[1]?.v;
+                } else if (label.toLowerCase().includes("lagu tutup")) {
+                    laguTutupNum = row.c[1]?.v;
+                }
+            }
+
+            // Now process the main schedule
+            const json = JSON.parse(sheetText.substring(47, sheetText.length - 2));
 
         fetch(SHEET_URL)
             .then(res => res.text())
@@ -169,6 +225,11 @@
                     const role = row.c[0]?.v || "";
                     const person = row.c[columnIndex]?.v || "";
 
+                    // Skip penyedia potluck and koordinator rows
+                    if (role.toLowerCase().includes("penyedia potluck") || role.toLowerCase().includes("koordinator")) {
+                        continue;
+                    }
+
                     // Determine which section we're in
                     if (role.includes("DEWASA")) {
                         currentSection = "ssDewasa";
@@ -203,10 +264,8 @@
                     item.className = "list-group-item border-0 py-2 px-3";
                     item.innerHTML = `
                         <div class="flex justify-between items-center" style="font-size: 0.9rem;">
-                            <div>
-                                <span class="font-semibold text-gray-700">${displayRole}</span>
-                                <span class="text-gray-900">${person}</span>
-                            </div>
+                            <span class="font-semibold text-gray-700">${displayRole}</span>
+                            <span class="text-gray-900">${person}</span>
                         </div>
                     `;
 
@@ -237,12 +296,38 @@
                 khotbahItems.forEach(item => {
                     khotbahList.appendChild(item.element);
                 });
+                
+                // Add Lagu Buka and Lagu Tutup at the end of khotbah section
+                if (laguBukaNum && laguSionMap[laguBukaNum]) {
+                    const laguBukaItem = document.createElement("li");
+                    laguBukaItem.className = "list-group-item border-0 py-2 px-3";
+                    laguBukaItem.innerHTML = `
+                        <div class="flex justify-between items-center" style="font-size: 0.9rem;">
+                            <span class="font-semibold text-gray-700">Lagu Buka</span>
+                            <span class="text-gray-900">LSEL no. ${laguBukaNum} - ${laguSionMap[laguBukaNum]}</span>
+                        </div>
+                    `;
+                    khotbahList.appendChild(laguBukaItem);
+                }
+                
+                if (laguTutupNum && laguSionMap[laguTutupNum]) {
+                    const laguTutupItem = document.createElement("li");
+                    laguTutupItem.className = "list-group-item border-0 py-2 px-3";
+                    laguTutupItem.innerHTML = `
+                        <div class="flex justify-between items-center" style="font-size: 0.9rem;">
+                            <span class="font-semibold text-gray-700">Lagu Tutup</span>
+                            <span class="text-gray-900">LSEL no. ${laguTutupNum} - ${laguSionMap[laguTutupNum]}</span>
+                        </div>
+                    `;
+                    khotbahList.appendChild(laguTutupItem);
+                }
             })
             .catch(err => {
                 console.error(err);
                 document.getElementById("scheduleDate").innerHTML =
                     "<span class='text-danger'>Gagal memuat jadwal</span>";
             });
+        });
     </script>
 
 </body>
