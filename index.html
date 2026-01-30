@@ -47,15 +47,12 @@
             </div>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center mb-3" style="gap: 1rem;">
-            <button id="prevWeek" class="btn btn-outline-primary" style="font-size: 0.9rem;">
-                <i class="bi bi-chevron-left"></i> Minggu Lalu
-            </button>
+        <div class="d-flex justify-content-center align-items-center mb-3" style="gap: 1rem;">
             <button id="thisWeek" class="btn btn-outline-secondary" style="font-size: 0.85rem;">
-                Minggu Ini
+                Sabat Ini
             </button>
             <button id="nextWeek" class="btn btn-outline-primary" style="font-size: 0.9rem;">
-                Minggu Depan <i class="bi bi-chevron-right"></i>
+                Sabat Depan <i class="bi bi-chevron-right"></i>
             </button>
         </div>
 
@@ -358,45 +355,16 @@
             });
         });
         
-        // Swipe detection
-        let touchStartX = 0;
-        let touchEndX = 0;
-        
-        const scheduleContainer = document.getElementById('scheduleContainer');
-        
-        scheduleContainer.addEventListener('touchstart', e => {
-            touchStartX = e.changedTouches[0].screenX;
+        // Navigation buttons - toggle between current week (0) and next week (1)
+        document.getElementById('nextWeek').addEventListener('click', () => {
+            weekOffset = 1;
+            loadSchedule();
         });
         
-        scheduleContainer.addEventListener('touchend', e => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        });
-        
-        function handleSwipe() {
-            const swipeThreshold = 50;
-            if (touchEndX < touchStartX - swipeThreshold) {
-                // Swiped left - show next week
-                navigateWeek(1);
-            }
-            if (touchEndX > touchStartX + swipeThreshold) {
-                // Swiped right - show previous week
-                navigateWeek(-1);
-            }
-        }
-        
-        // Navigation buttons
-        document.getElementById('prevWeek').addEventListener('click', () => navigateWeek(-1));
-        document.getElementById('nextWeek').addEventListener('click', () => navigateWeek(1));
         document.getElementById('thisWeek').addEventListener('click', () => {
             weekOffset = 0;
             loadSchedule();
         });
-        
-        function navigateWeek(offset) {
-            weekOffset += offset;
-            loadSchedule();
-        }
         
         function loadSchedule() {
             // Reload all data with new week offset
