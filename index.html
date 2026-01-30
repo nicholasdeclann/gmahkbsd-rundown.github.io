@@ -22,14 +22,8 @@
         <div class="text-center mb-3 mb-md-4">
             <img src="GMAHK BSD.png" alt="GMAHK BSD" class="mx-auto mb-2 mb-md-3" style="max-width: 150px;">
             <h1 class="font-bold" style="font-size: 1.5rem;">Kertas Acara GMAHK BSD</h1>
-            <h2 class="text-gray-700 mt-1 mt-md-2" style="font-size: 1.1rem;" id="scheduleDate"><i class="bi bi-arrow-clockwise" style="animation: spin 1s linear infinite;"></i></h2>
+            <h2 class="text-gray-700 mt-1 mt-md-2" style="font-size: 1.1rem;" id="scheduleDate"><span class="spinner-border spinner-border-sm" role="status" style="color: #2e6ce8;"></span></h2>
             <p class="text-gray-500" style="font-size: 0.75rem;" id="lastUpdated"></p>
-            <style>
-                @keyframes spin {
-                    from { transform: rotate(0deg); }
-                    to { transform: rotate(360deg); }
-                }
-            </style>
         </div>
 
         <div id="scheduleContainer">
@@ -58,7 +52,7 @@
 
         <div class="text-center mt-4">
             <a href="https://wa.me/628119700888" target="_blank" class="btn btn-success" style="background-color: #25D366; border-color: #25D366; font-size: 0.95rem; padding: 0.6rem 1.5rem;">
-                <i class="bi bi-whatsapp"></i> Hubungi Dept. Komunikasi
+                <i class="bi bi-whatsapp"></i> Kontak Dept. Komunikasi
             </a>
         </div>
     </div>
@@ -72,7 +66,8 @@
         const LAGU_SION_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID_2}/gviz/tq?tqx=out:json&gid=1174681408`;
 
         // Get this week's Saturday (or next Saturday if today is Sunday)
-        let weekOffset = 0; // Track which week we're viewing
+        // Track which column offset to use (0 = this week, 1 = next week)
+        let columnOffset = parseInt(localStorage.getItem('columnOffset') || '0');
         
         function getThisWeeksSaturday() {
             const today = new Date();
@@ -91,7 +86,7 @@
             }
             
             const saturday = new Date(today);
-            saturday.setDate(today.getDate() + daysUntilSaturday + (weekOffset * 7));
+            saturday.setDate(today.getDate() + daysUntilSaturday + (columnOffset * 7));
             return saturday;
         }
 
@@ -151,6 +146,8 @@
             
             let laguBukaNum = null;
             let laguTutupNum = null;
+            let laguBukaSSNum = null;
+            let laguTutupSSNum = null;
             
             // Find lagu buka and lagu tutup from the kertas acara sheet
             for (let i = 0; i < kertasAcaraRows.length; i++) {
@@ -167,6 +164,12 @@
                 } else if (label.toLowerCase().includes("lagu tutup") && !label.toLowerCase().includes("ss")) {
                     laguTutupNum = row.c[2]?.v;
                     console.log("Found Lagu Tutup at row", i, "with value:", laguTutupNum);
+                } else if (label.toLowerCase().includes("lagu buka ss")) {
+                    laguBukaSSNum = row.c[2]?.v;
+                    console.log("Found Lagu Buka SS at row", i, "with value:", laguBukaSSNum);
+                } else if (label.toLowerCase().includes("lagu tutup ss")) {
+                    laguTutupSSNum = row.c[2]?.v;
+                    console.log("Found Lagu Tutup SS at row", i, "with value:", laguTutupSSNum);
                 }
             }
             
@@ -262,6 +265,7 @@
                 let currentSection = null;
                 const khotbahItems = []; // Buffer for khotbah items to reorder
                 const khotbahData = {}; // Store khotbah data by role name
+                const ssData = {}; // Store SS data by role name
 
                 // Skip header rows and process schedule rows
                 for (let i = 4; i < rows.length; i++) {
@@ -311,13 +315,15 @@
                     item.innerHTML = `
                         <div class="flex justify-between items-center" style="font-size: 0.9rem;">
                             <span class="font-semibold text-gray-700">${displayRole}</span>
-                            <span class="text-gray-900">${person}</span>
+                            <span class="text-gray-900 text-right" style="text-align: right;">${person}</span>
                         </div>
                     `;
 
                     // Add to appropriate list
                     if (currentSection === "ssDewasa") {
-                        ssDewaساList.appendChild(item);
+                        // Store SS data for custom ordering
+                        const roleKey = role.toLowerCase();
+                        ssData[roleKey] = { role: displayRole, person: person };
                     } else if (currentSection === "khotbah") {
                         // Store khotbah data for custom ordering
                         const roleKey = role.toLowerCase();
@@ -329,14 +335,55 @@
                     }
                 }
 
+                // Build Sekolah Sabat section in specific order
+                const createSSItem = (label, value) => {
+                    const item = document.createElement("li");
+                    item.className = "list-group-item border-0 py-2 px-3";
+                    const isLaguSion = value.includes('LSEL');
+                    const valueColor = isLaguSion ? '#2e6ce8' : '#111827';
+                    item.innerHTML = `
+                        <div class="flex justify-between items-center" style="font-size: 0.9rem;">
+                            <span class="font-semibold text-gray-700">${label}</span>
+                            <span class="text-gray-900 text-right" style="color: ${valueColor}; text-align: right;">${value}</span>
+                        </div>
+                    `;
+                    return item;
+                };
+
+                // Get persons from SS data
+                const doronganPP = ssData['dorongan pp']?.person || '';
+                
+                // Build SS section in specified order
+                const ssOrderedItems = [
+                    { label: 'Sambutan Pemimpin', value: ssData['sambutan pemimpin']?.person || '' },
+                    { label: 'Lagu Pembuka', value: laguBukaSSNum && laguSionMap[laguBukaSSNum] ? `LSEL no. ${laguBukaSSNum} - ${laguSionMap[laguBukaSSNum]}` : '' },
+                    { label: 'Ayat Inti & Doa Bertelut', value: ssData['ayat inti & doa bertelut']?.person || '' },
+                    { label: 'Berita Mission', value: ssData['berita mission']?.person || '' },
+                    { label: 'Kuis', value: ssData['kuis']?.person || '' },
+                    { label: 'Diskusi Pelajaran SS', value: ssData['diskusi pelajaran ss']?.person || '' },
+                    { label: 'Lagu Pujian', value: ssData['lagu pujian']?.person || '' },
+                    { label: 'Dorongan PP', value: doronganPP },
+                    { label: 'Lagu Penutup', value: laguTutupSSNum && laguSionMap[laguTutupSSNum] ? `LSEL no. ${laguTutupSSNum} - ${laguSionMap[laguTutupSSNum]}` : 'SDA Hymnal 602 - Setialah Saudara' },
+                    { label: 'Doa Penutup', value: doronganPP },
+                    { label: 'Pengumuman', value: 'Dept. Komunikasi, Ketua Jemaat' }
+                ];
+
+                ssOrderedItems.forEach(item => {
+                    if (item.value) {
+                        ssDewaساList.appendChild(createSSItem(item.label, item.value));
+                    }
+                });
+
                 // Build khotbah section in specific order
                 const createKhotbahItem = (label, value) => {
                     const item = document.createElement("li");
                     item.className = "list-group-item border-0 py-2 px-3";
+                    const isLaguSion = value.includes('LSEL') || value.includes('Instrumental');
+                    const valueColor = isLaguSion ? '#2e6ce8' : '#111827';
                     item.innerHTML = `
                         <div class="flex justify-between items-center" style="font-size: 0.9rem;">
                             <span class="font-semibold text-gray-700">${label}</span>
-                            <span class="text-gray-900">${value}</span>
+                            <span class="text-gray-900 text-right" style="color: ${valueColor}; text-align: right;">${value}</span>
                         </div>
                     `;
                     return item;
@@ -385,19 +432,14 @@
         
         // Navigation buttons - toggle between current week (0) and next week (1)
         document.getElementById('nextWeek').addEventListener('click', () => {
-            weekOffset = 1;
-            loadSchedule();
+            localStorage.setItem('columnOffset', '1');
+            location.reload();
         });
         
         document.getElementById('thisWeek').addEventListener('click', () => {
-            weekOffset = 0;
-            loadSchedule();
-        });
-        
-        function loadSchedule() {
-            // Reload all data with new week offset
+            localStorage.setItem('columnOffset', '0');
             location.reload();
-        }
+        });
     </script>
 
 </body>
