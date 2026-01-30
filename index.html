@@ -147,18 +147,18 @@
             let laguTutupSSNum = null;
             
             // Find lagu buka and lagu tutup from the kertas acara sheet
-            // Structure: Column 0 = Label, Column 1 = Song Number for Khotbah
+            // Structure: Column 1 = Label, Column 2 = Song Number for Khotbah
             //            Column 7 = SS Label, Column 8 = Song Number for SS
             for (let i = 0; i < kertasAcaraRows.length; i++) {
                 const row = kertasAcaraRows[i];
                 if (!row.c) continue;
-                const label = row.c[0]?.v || "";
+                const label = row.c[1]?.v || "";
                 
                 if (label.toLowerCase() === "lagu buka") {
-                    laguBukaNum = row.c[1]?.v; // Column 1 has khotbah song number
+                    laguBukaNum = row.c[2]?.v; // Column 2 has khotbah song number
                     laguBukaSSNum = row.c[8]?.v; // Column 8 has SS song number
                 } else if (label.toLowerCase() === "lagu tutup") {
-                    laguTutupNum = row.c[1]?.v; // Column 1 has khotbah song number
+                    laguTutupNum = row.c[2]?.v; // Column 2 has khotbah song number
                     // SS closing song is hardcoded per user request
                 }
             }
@@ -244,7 +244,13 @@
                 const ssData = {}; // Store SS data by role name
 
                 // Skip header rows and process schedule rows
+                let skipNextRow = false;
                 for (let i = 4; i < rows.length; i++) {
+                    if (skipNextRow) {
+                        skipNextRow = false;
+                        continue;
+                    }
+                    
                     const row = rows[i];
                     if (!row.c) continue;
 
@@ -286,14 +292,46 @@
                         }
                     }
 
+                    // Check if this is a multi-person role (Diakon Persembahan or Diakones & BWA)
+                    const isMultiPersonRole = role.toLowerCase().includes("diakon persembahan") || 
+                                             role.toLowerCase().includes("diakones") || 
+                                             role.toLowerCase().includes("bwa");
+                    
+                    let person2 = "";
+                    if (isMultiPersonRole && i + 1 < rows.length) {
+                        const nextRow = rows[i + 1];
+                        const nextRole = nextRow.c?.[0]?.v || "";
+                        // Check if next row is continuation (empty role)
+                        if (!nextRole || nextRole.trim() === "") {
+                            person2 = nextRow.c?.[columnIndex]?.v || "";
+                            if (person2) {
+                                skipNextRow = true;
+                            }
+                        }
+                    }
+
                     const item = document.createElement("li");
                     item.className = "list-group-item border-0 py-2 px-3";
-                    item.innerHTML = `
-                        <div class="flex justify-between items-center" style="font-size: 0.9rem;">
-                            <span class="font-semibold text-gray-700">${displayRole}</span>
-                            <span class="text-gray-900 text-right" style="text-align: right;">${person}</span>
-                        </div>
-                    `;
+                    
+                    if (person2) {
+                        // Create item with two people displayed vertically
+                        item.innerHTML = `
+                            <div class="flex justify-between" style="font-size: 0.9rem;">
+                                <span class="font-semibold text-gray-700">${displayRole}</span>
+                                <div class="text-right" style="text-align: right;">
+                                    <div class="text-gray-900">${person}</div>
+                                    <div class="text-gray-900">${person2}</div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        item.innerHTML = `
+                            <div class="flex justify-between items-center" style="font-size: 0.9rem;">
+                                <span class="font-semibold text-gray-700">${displayRole}</span>
+                                <span class="text-gray-900 text-right" style="text-align: right;">${person}</span>
+                            </div>
+                        `;
+                    }
 
                     // Add to appropriate list
                     if (currentSection === "ssDewasa") {
@@ -315,11 +353,12 @@
                 const createSSItem = (label, value) => {
                     const item = document.createElement("li");
                     item.className = "list-group-item border-0 py-2 px-3";
-                    const isLaguSion = value.includes('LSEL');
+                    const isLaguSion = value.includes('LSEL') || value.includes('SDA Hymnal');
                     const valueColor = isLaguSion ? '#2e6ce8' : '#111827';
+                    const labelColor = isLaguSion ? '#2e6ce8' : '';
                     item.innerHTML = `
                         <div class="flex justify-between items-center" style="font-size: 0.9rem;">
-                            <span class="font-semibold text-gray-700">${label}</span>
+                            <span class="font-semibold text-gray-700" style="color: ${labelColor};">${label}</span>
                             <span class="text-gray-900 text-right" style="color: ${valueColor}; text-align: right;">${value}</span>
                         </div>
                     `;
@@ -356,9 +395,10 @@
                     item.className = "list-group-item border-0 py-2 px-3";
                     const isLaguSion = value.includes('LSEL') || value.includes('Instrumental');
                     const valueColor = isLaguSion ? '#2e6ce8' : '#111827';
+                    const labelColor = isLaguSion ? '#2e6ce8' : '';
                     item.innerHTML = `
                         <div class="flex justify-between items-center" style="font-size: 0.9rem;">
-                            <span class="font-semibold text-gray-700">${label}</span>
+                            <span class="font-semibold text-gray-700" style="color: ${labelColor};">${label}</span>
                             <span class="text-gray-900 text-right" style="color: ${valueColor}; text-align: right;">${value}</span>
                         </div>
                     `;
