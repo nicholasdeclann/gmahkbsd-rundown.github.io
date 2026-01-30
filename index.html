@@ -141,43 +141,30 @@
             const kertasAcaraJson = JSON.parse(kertasAcaraText.substring(47, kertasAcaraText.length - 2));
             const kertasAcaraRows = kertasAcaraJson.table.rows;
             
-            console.log("Kertas Acara - Total rows:", kertasAcaraRows.length);
-            console.log("Kertas Acara - First 10 rows:", kertasAcaraRows.slice(0, 10));
-            
             let laguBukaNum = null;
             let laguTutupNum = null;
             let laguBukaSSNum = null;
             let laguTutupSSNum = null;
             
             // Find lagu buka and lagu tutup from the kertas acara sheet
+            // Structure: Column 0 = Label, Column 1 = Song Number for Khotbah
+            //            Column 7 = SS Label, Column 8 = Song Number for SS
             for (let i = 0; i < kertasAcaraRows.length; i++) {
                 const row = kertasAcaraRows[i];
                 if (!row.c) continue;
                 const label = row.c[0]?.v || "";
-                const value = row.c[2]?.v || ""; // Column 2 has the song number
                 
-                console.log(`Row ${i}: label="${label}", value="${value}"`);
-                
-                if (label.toLowerCase().includes("lagu buka") && !label.toLowerCase().includes("ss")) {
-                    laguBukaNum = row.c[2]?.v;
-                    console.log("Found Lagu Buka at row", i, "with value:", laguBukaNum);
-                } else if (label.toLowerCase().includes("lagu tutup") && !label.toLowerCase().includes("ss")) {
-                    laguTutupNum = row.c[2]?.v;
-                    console.log("Found Lagu Tutup at row", i, "with value:", laguTutupNum);
-                } else if (label.toLowerCase().includes("lagu buka ss")) {
-                    laguBukaSSNum = row.c[2]?.v;
-                    console.log("Found Lagu Buka SS at row", i, "with value:", laguBukaSSNum);
-                } else if (label.toLowerCase().includes("lagu tutup ss")) {
-                    laguTutupSSNum = row.c[2]?.v;
-                    console.log("Found Lagu Tutup SS at row", i, "with value:", laguTutupSSNum);
+                if (label.toLowerCase() === "lagu buka") {
+                    laguBukaNum = row.c[1]?.v; // Column 1 has khotbah song number
+                    laguBukaSSNum = row.c[8]?.v; // Column 8 has SS song number
+                } else if (label.toLowerCase() === "lagu tutup") {
+                    laguTutupNum = row.c[1]?.v; // Column 1 has khotbah song number
+                    // SS closing song is hardcoded per user request
                 }
             }
             
-            console.log("Lagu Buka Number:", laguBukaNum);
-            console.log("Lagu Tutup Number:", laguTutupNum);
-            console.log("Lagu Buka Title:", laguSionMap[laguBukaNum]);
-            console.log("Lagu Tutup Title:", laguSionMap[laguTutupNum]);
-            console.log("Lagu Sion Map:", laguSionMap);
+            // Hardcode SS closing song as per user requirement
+            laguTutupSSNum = null; // Will use fallback text "SDA Hymnal 602 - Setialah Saudara"
 
             // Now process the main schedule
             const json = JSON.parse(sheetText.substring(47, sheetText.length - 2));
@@ -200,35 +187,24 @@
                 });
                 document.getElementById("lastUpdated").textContent = `Data partisipan diambil pada: ${timeString}`;
 
-                // Debug: log the data structure
-                console.log("Total rows:", rows.length);
-                console.log("First few rows:", rows.slice(0, 5));
-
                 // Get this Saturday's date
                 const thisSaturday = getThisWeeksSaturday();
                 const targetDate = formatDate(thisSaturday);
                 const saturdayNumber = getSaturdayOfMonth(thisSaturday);
-                console.log("Looking for date:", targetDate);
-                console.log("Saturday of month:", saturdayNumber);
 
                 // Find the column index for this week's Saturday
                 const dateRow = rows[0]; // Row with dates (TANGGAL row)
                 let columnIndex = -1;
 
-                console.log("Date row:", dateRow);
-
                 if (dateRow && dateRow.c) {
-                    console.log("Searching through columns...");
                     for (let i = 1; i < dateRow.c.length; i++) {
                         const cellValue = dateRow.c[i]?.v || "";
                         const formattedValue = dateRow.c[i]?.f || "";
-                        console.log(`Column ${i}: v="${cellValue}", f="${formattedValue}"`);
                         
                         // Check both the value and formatted value
                         const searchIn = cellValue + " " + formattedValue;
                         if (searchIn.includes(targetDate.split(' ')[0]) && searchIn.includes(targetDate.split(' ')[1])) {
                             columnIndex = i;
-                            console.log("Found match at column", i);
                             break;
                         }
                     }
@@ -424,7 +400,6 @@
                 });
             })
             .catch(err => {
-                console.error(err);
                 document.getElementById("scheduleDate").innerHTML =
                     "<span class='text-danger'>Gagal memuat jadwal</span>";
             });
