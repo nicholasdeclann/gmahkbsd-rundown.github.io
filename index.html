@@ -18,10 +18,21 @@
         <div class="text-center mb-4">
             <img src="GMAHK BSD.png" alt="GMAHK BSD" class="mx-auto mb-3" style="max-width: 200px;">
             <h1 class="text-3xl font-bold">Kertas Acara GMAHK BSD</h1>
+            <h2 class="text-xl text-gray-700 mt-2" id="scheduleDate">Loading...</h2>
             <p class="text-gray-500 text-sm" id="lastUpdated">Loading...</p>
         </div>
 
-        <ul id="scheduleList" class="list-group list-group-flush"></ul>
+        <div id="scheduleContainer">
+            <div class="mb-4">
+                <ul id="ssDewaساList" class="list-group list-group-flush"></ul>
+            </div>
+            <div class="mb-4">
+                <ul id="khotbahList" class="list-group list-group-flush"></ul>
+            </div>
+            <div class="mb-4">
+                <ul id="pelayananList" class="list-group list-group-flush"></ul>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -47,23 +58,27 @@
         }
 
         fetch(SHEET_URL)
-            .then(res => res.text())
+            .then(res => {
+                // Get last modified time from response headers
+                const lastModified = res.headers.get('Last-Modified');
+                if (lastModified) {
+                    const modifiedDate = new Date(lastModified);
+                    const timeString = modifiedDate.toLocaleString('en-GB', { 
+                        day: '2-digit', 
+                        month: 'short', 
+                        year: 'numeric', 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        hour12: false 
+                    });
+                    document.getElementById("lastUpdated").textContent = `Last updated: ${timeString}`;
+                }
+                return res.text();
+            })
             .then(text => {
                 const json = JSON.parse(text.substring(47, text.length - 2));
                 const rows = json.table.rows;
                 const list = document.getElementById("scheduleList");
-
-                // Update last updated timestamp
-                const now = new Date();
-                const timeString = now.toLocaleString('en-GB', { 
-                    day: '2-digit', 
-                    month: 'short', 
-                    year: 'numeric', 
-                    hour: '2-digit', 
-                    minute: '2-digit',
-                    hour12: false 
-                });
-                document.getElementById("lastUpdated").textContent = `Last updated: ${timeString}`;
 
                 // Debug: log the data structure
                 console.log("Total rows:", rows.length);
@@ -98,14 +113,30 @@
                 }
 
                 if (columnIndex === -1) {
-                    list.innerHTML = `<li class='list-group-item text-warning'>No schedule found for ${targetDate}. Check console for debug info.</li>`;
+                    document.getElementById("scheduleDate").innerHTML = `<span class='text-warning'>No schedule found for ${targetDate}</span>`;
                     return;
                 }
 
-                // Display the schedule for this Saturday
-                list.innerHTML = `<li class='list-group-item bg-primary text-white'>
-                    <h4 class="font-bold mb-0">Schedule for ${targetDate}</h4>
+                // Display the schedule date as subtitle
+                document.getElementById("scheduleDate").textContent = `Schedule for ${targetDate}`;
+
+                // Get list containers
+                const ssDewaساList = document.getElementById("ssDewaساList");
+                const khotbahList = document.getElementById("khotbahList");
+                const pelayananList = document.getElementById("pelayananList");
+
+                // Add headers for each section
+                ssDewaساList.innerHTML = `<li class='list-group-item bg-primary text-white'>
+                    <h4 class="font-bold mb-0">SS DEWASA</h4>
                 </li>`;
+                khotbahList.innerHTML = `<li class='list-group-item bg-primary text-white'>
+                    <h4 class="font-bold mb-0">KHOTBAH</h4>
+                </li>`;
+                pelayananList.innerHTML = `<li class='list-group-item bg-primary text-white'>
+                    <h4 class="font-bold mb-0">PELAYANAN MUSIK</h4>
+                </li>`;
+
+                let currentSection = null;
 
                 // Skip header rows and process schedule rows
                 for (let i = 4; i < rows.length; i++) {
@@ -115,16 +146,21 @@
                     const role = row.c[0]?.v || "";
                     const person = row.c[columnIndex]?.v || "";
 
-                    // Skip empty roles or section headers
-                    if (!role || !person || role.includes("DEWASA") || role.includes("KHOTBAH")) {
-                        if (role.includes("DEWASA") || role.includes("KHOTBAH")) {
-                            const item = document.createElement("li");
-                            item.className = "list-group-item bg-light";
-                            item.innerHTML = `<h5 class="font-bold mb-0 text-primary">${role}</h5>`;
-                            list.appendChild(item);
-                        }
+                    // Determine which section we're in
+                    if (role.includes("DEWASA")) {
+                        currentSection = "ssDewasa";
                         continue;
+                    } else if (role.includes("KHOTBAH")) {
+                        currentSection = "khotbah";
+                        continue;
+                    } else if (role.toLowerCase().includes("pelayanan musik") || role.toLowerCase().includes("pianist") || role.toLowerCase().includes("keyboardist")) {
+                        if (!currentSection || currentSection !== "pelayanan") {
+                            currentSection = "pelayanan";
+                        }
                     }
+
+                    // Skip empty roles
+                    if (!role || !person) continue;
 
                     const item = document.createElement("li");
                     item.className = "list-group-item";
@@ -134,7 +170,15 @@
                             <span class="text-gray-900">${person}</span>
                         </div>
                     `;
-                    list.appendChild(item);
+
+                    // Add to appropriate list
+                    if (currentSection === "ssDewasa") {
+                        ssDewaساList.appendChild(item);
+                    } else if (currentSection === "khotbah") {
+                        khotbahList.appendChild(item);
+                    } else if (currentSection === "pelayanan") {
+                        pelayananList.appendChild(item);
+                    }
                 }
             })
             .catch(err => {
