@@ -51,6 +51,12 @@
         </div>
 
         <div class="text-center mt-4">
+            <a href="https://www.canva.com/design/DAG-9nAgcSE/xxLYrc05ZBMZ81c284JgMA/view?utm_content=DAG-9nAgcSE&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h4ccefbb367" target="_blank" class="btn btn-primary" style="background-color: #2e6ce8; border-color: #2e6ce8; font-size: 0.95rem; padding: 0.6rem 1.5rem;">
+                <i class="bi bi-megaphone"></i> Pengumuman Komunikasi
+            </a>
+        </div>
+        
+        <div class="text-center mt-3">
             <a href="https://wa.me/628119700888" target="_blank" class="btn btn-success" style="background-color: #25D366; border-color: #25D366; font-size: 0.95rem; padding: 0.6rem 1.5rem;">
                 <i class="bi bi-whatsapp"></i> Kontak Dept. Komunikasi
             </a>
@@ -378,25 +384,25 @@
                 const doronganPP = ssData['dor. pp/rt/kesehatan']?.person || '';
                 
                 // Build SS section in specified order
-                // For next week (columnOffset = 1), show empty strings for songs
+                // For next week (columnOffset = 1), show '-' for songs
                 const showSongs = columnOffset === 0;
                 const ssOrderedItems = [
-                    { label: 'Sambutan Pemimpin', value: ssData['pemimpin']?.person || '' },
-                    { label: 'Lagu Pembuka', value: showSongs && laguBukaSSNum && laguSionMap[laguBukaSSNum] ? `LSEL no. ${laguBukaSSNum} - ${laguSionMap[laguBukaSSNum]}` : '' },
-                    { label: 'Ayat Inti & Doa Bertelut', value: ssData['ayat inti/doa buka ss']?.person || '' },
-                    { label: 'Berita Mission', value: ssData['berita mission']?.person || '' },
-                    { label: 'Kuis', value: ssData['kuis sekolah sabat']?.person || '' },
-                    { label: 'Diskusi Pelajaran SS', value: ssData['diskusi sekolah sabat']?.person || '' },
-                    { label: 'Lagu Pujian', value: ssData['lagu pujian']?.person || '' },
-                    { label: 'Dorongan PP', value: doronganPP },
-                    { label: 'Lagu Penutup', value: showSongs && laguTutupSSNum && laguSionMap[laguTutupSSNum] ? `LSEL no. ${laguTutupSSNum} - ${laguSionMap[laguTutupSSNum]}` : (showSongs ? 'SDA Hymnal 602 - Setialah Saudara' : '') },
-                    { label: 'Doa Penutup', value: doronganPP },
+                    { label: 'Sambutan Pemimpin', value: ssData['pemimpin']?.person || '-' },
+                    { label: 'Lagu Pembuka', value: showSongs && laguBukaSSNum && laguSionMap[laguBukaSSNum] ? `LSEL no. ${laguBukaSSNum} - ${laguSionMap[laguBukaSSNum]}` : '-' },
+                    { label: 'Ayat Inti & Doa Bertelut', value: ssData['ayat inti/doa buka ss']?.person || '-' },
+                    { label: 'Berita Mission', value: ssData['berita mission']?.person || '-' },
+                    { label: 'Kuis', value: ssData['kuis sekolah sabat']?.person || '-' },
+                    { label: 'Diskusi Pelajaran SS', value: ssData['diskusi sekolah sabat']?.person || '-' },
+                    { label: 'Lagu Pujian', value: ssData['lagu pujian']?.person || '-' },
+                    { label: 'Dorongan PP', value: doronganPP || '-' },
+                    { label: 'Lagu Penutup', value: showSongs ? (laguTutupSSNum && laguSionMap[laguTutupSSNum] ? `LSEL no. ${laguTutupSSNum} - ${laguSionMap[laguTutupSSNum]}` : 'SDA Hymnal 602 - Setialah Saudara') : '-' },
+                    { label: 'Doa Penutup', value: doronganPP || '-' },
                     { label: 'Pengumuman', value: 'Dept. Komunikasi, Ketua Jemaat' }
                 ];
 
                 ssOrderedItems.forEach(item => {
-                    // Show all rows, even with empty values for next week
-                    ssDewaساList.appendChild(createSSItem(item.label, item.value || '-'));
+                    // Show all rows with pre-defined values
+                    ssDewaساList.appendChild(createSSItem(item.label, item.value));
                 });
 
                 // Build khotbah section in specific order
@@ -435,31 +441,31 @@
                 const khotbahTitle = khotbahData['khotbah']?.person || '';
                 
                 // Build in specified order
-                // For next week (columnOffset = 1), show empty strings for songs and Instrumental
+                // For next week (columnOffset = 1), show '-' for songs and Instrumental
                 const orderedItems = [
-                    { label: 'Lagu Partisipan Khotbah', value: showSongs && laguSionMap[421] ? `LSEL no. 421 - ${laguSionMap[421]}` : '', middleValue: null },
-                    { label: 'Lagu Pembuka', value: showSongs && laguBukaNum && laguSionMap[laguBukaNum] ? `LSEL no. ${laguBukaNum} - ${laguSionMap[laguBukaNum]}` : '', middleValue: null },
-                    { label: 'Doa Syafaat', value: khotbahData['doa syafaat']?.person || '', middleValue: null },
-                    { label: 'Bacaan Persembahan', value: bacaanPersembahan, middleValue: null },
-                    { label: 'Lagu Persembahan', value: showSongs ? 'Instrumental' : '', middleValue: null },
-                    { label: 'Lagu Sambutan', value: showSongs && laguSionMap[21] ? `LSEL no. 21 - ${laguSionMap[21]}` : '', middleValue: null },
-                    { label: 'Doa Persembahan', value: bacaanPersembahan, middleValue: null },
+                    { label: 'Lagu Partisipan Khotbah', value: showSongs && laguSionMap[421] ? `LSEL no. 421 - ${laguSionMap[421]}` : '-', middleValue: null },
+                    { label: 'Lagu Pembuka', value: showSongs && laguBukaNum && laguSionMap[laguBukaNum] ? `LSEL no. ${laguBukaNum} - ${laguSionMap[laguBukaNum]}` : '-', middleValue: null },
+                    { label: 'Doa Syafaat', value: khotbahData['doa syafaat']?.person || '-', middleValue: null },
+                    { label: 'Bacaan Persembahan', value: bacaanPersembahan || '-', middleValue: null },
+                    { label: 'Lagu Persembahan', value: showSongs ? 'Instrumental' : '-', middleValue: null },
+                    { label: 'Lagu Sambutan', value: showSongs && laguSionMap[21] ? `LSEL no. 21 - ${laguSionMap[21]}` : '-', middleValue: null },
+                    { label: 'Doa Persembahan', value: bacaanPersembahan || '-', middleValue: null },
                     { label: 'Lagu Pujian', value: khotbahData['lagu pujian']?.person || khotbahData['lagu pujian 1']?.person || '-', middleValue: null },
-                    { label: 'Cerita Anak', value: khotbahData['cerita anak']?.person || '', middleValue: null },
-                    { label: 'Lagu Pujian', value: khotbahData['lagu pujian 2']?.person || '', middleValue: null },
-                    { label: 'Ayat Bersahutan', value: ayatBersahutan, middleValue: ayatBersahutanText || '-' },
-                    { label: 'Ayat Inti', value: ayatBersahutan, middleValue: ayatInti || '-' },
-                    { label: 'Lagu Sambutan Khotbah', value: showSongs && laguSionMap[524] ? `LSEL no. 524 - ${laguSionMap[524]}` : '', middleValue: null },
-                    { label: 'Doa Pendek', value: pembicara, middleValue: null },
-                    { label: 'Khotbah', value: khotbahTitle || pembicara, middleValue: judulKhotbah || '-' },
-                    { label: 'Lagu Penutup', value: showSongs && laguSionMap[302] ? `LSEL no. 302 - ${laguSionMap[302]}` : '', middleValue: null },
-                    { label: 'Doa Penutup', value: pembicara, middleValue: null },
-                    { label: 'Lagu Sambutan', value: showSongs && laguSionMap[168] ? `LSEL no. 168 - ${laguSionMap[168]}` : '', middleValue: null }
+                    { label: 'Cerita Anak', value: khotbahData['cerita anak']?.person || '-', middleValue: null },
+                    { label: 'Lagu Pujian', value: khotbahData['lagu pujian 2']?.person || '-', middleValue: null },
+                    { label: 'Ayat Bersahutan', value: ayatBersahutan || '-', middleValue: ayatBersahutanText || '-' },
+                    { label: 'Ayat Inti', value: ayatBersahutan || '-', middleValue: ayatInti || '-' },
+                    { label: 'Lagu Sambutan Khotbah', value: showSongs && laguSionMap[524] ? `LSEL no. 524 - ${laguSionMap[524]}` : '-', middleValue: null },
+                    { label: 'Doa Pendek', value: pembicara || '-', middleValue: null },
+                    { label: 'Khotbah', value: khotbahTitle || pembicara || '-', middleValue: judulKhotbah || '-' },
+                    { label: 'Lagu Penutup', value: showSongs && laguSionMap[302] ? `LSEL no. 302 - ${laguSionMap[302]}` : '-', middleValue: null },
+                    { label: 'Doa Penutup', value: pembicara || '-', middleValue: null },
+                    { label: 'Lagu Sambutan', value: showSongs && laguSionMap[168] ? `LSEL no. 168 - ${laguSionMap[168]}` : '-', middleValue: null }
                 ];
 
                 orderedItems.forEach(item => {
-                    // Show all rows, even with empty values for next week
-                    khotbahList.appendChild(createKhotbahItem(item.label, item.value || '-', item.middleValue));
+                    // Show all rows with pre-defined values
+                    khotbahList.appendChild(createKhotbahItem(item.label, item.value, item.middleValue));
                 });
             })
             .catch(err => {
