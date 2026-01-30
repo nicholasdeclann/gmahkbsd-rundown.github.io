@@ -80,11 +80,14 @@
             
             let daysUntilSaturday;
             if (dayOfWeek === 0) {
-                // If today is Sunday, show next Saturday
+                // Sunday: show next Saturday (6 days away)
                 daysUntilSaturday = 6;
+            } else if (dayOfWeek === 6) {
+                // Saturday: show today (0 days)
+                daysUntilSaturday = 0;
             } else {
-                // Otherwise show this week's Saturday
-                daysUntilSaturday = (6 - dayOfWeek + 7) % 7 || 7;
+                // Mon-Fri: show this week's Saturday
+                daysUntilSaturday = 6 - dayOfWeek;
             }
             
             const saturday = new Date(today);
@@ -156,6 +159,12 @@
                     laguTutupNum = row.c[1]?.v;
                 }
             }
+            
+            console.log("Lagu Buka Number:", laguBukaNum);
+            console.log("Lagu Tutup Number:", laguTutupNum);
+            console.log("Lagu Buka Title:", laguSionMap[laguBukaNum]);
+            console.log("Lagu Tutup Title:", laguSionMap[laguTutupNum]);
+            console.log("Lagu Sion Map:", laguSionMap);
 
             // Now process the main schedule
             const json = JSON.parse(sheetText.substring(47, sheetText.length - 2));
