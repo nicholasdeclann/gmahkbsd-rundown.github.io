@@ -351,16 +351,16 @@
                 };
 
                 // Get persons from SS data
-                const doronganPP = ssData['dorongan pp']?.person || '';
+                const doronganPP = ssData['dor. pp/rt/kesehatan']?.person || '';
                 
                 // Build SS section in specified order
                 const ssOrderedItems = [
-                    { label: 'Sambutan Pemimpin', value: ssData['sambutan pemimpin']?.person || '' },
+                    { label: 'Sambutan Pemimpin', value: ssData['pemimpin']?.person || '' },
                     { label: 'Lagu Pembuka', value: laguBukaSSNum && laguSionMap[laguBukaSSNum] ? `LSEL no. ${laguBukaSSNum} - ${laguSionMap[laguBukaSSNum]}` : '' },
-                    { label: 'Ayat Inti & Doa Bertelut', value: ssData['ayat inti & doa bertelut']?.person || '' },
+                    { label: 'Ayat Inti & Doa Bertelut', value: ssData['ayat inti/doa buka ss']?.person || '' },
                     { label: 'Berita Mission', value: ssData['berita mission']?.person || '' },
-                    { label: 'Kuis', value: ssData['kuis']?.person || '' },
-                    { label: 'Diskusi Pelajaran SS', value: ssData['diskusi pelajaran ss']?.person || '' },
+                    { label: 'Kuis', value: ssData['kuis sekolah sabat']?.person || '' },
+                    { label: 'Diskusi Pelajaran SS', value: ssData['diskusi sekolah sabat']?.person || '' },
                     { label: 'Lagu Pujian', value: ssData['lagu pujian']?.person || '' },
                     { label: 'Dorongan PP', value: doronganPP },
                     { label: 'Lagu Penutup', value: laguTutupSSNum && laguSionMap[laguTutupSSNum] ? `LSEL no. ${laguTutupSSNum} - ${laguSionMap[laguTutupSSNum]}` : 'SDA Hymnal 602 - Setialah Saudara' },
