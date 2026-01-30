@@ -146,17 +146,27 @@
             const kertasAcaraJson = JSON.parse(kertasAcaraText.substring(47, kertasAcaraText.length - 2));
             const kertasAcaraRows = kertasAcaraJson.table.rows;
             
+            console.log("Kertas Acara - Total rows:", kertasAcaraRows.length);
+            console.log("Kertas Acara - First 10 rows:", kertasAcaraRows.slice(0, 10));
+            
             let laguBukaNum = null;
             let laguTutupNum = null;
             
             // Find lagu buka and lagu tutup from the kertas acara sheet
-            for (let row of kertasAcaraRows) {
+            for (let i = 0; i < kertasAcaraRows.length; i++) {
+                const row = kertasAcaraRows[i];
                 if (!row.c) continue;
                 const label = row.c[0]?.v || "";
-                if (label.toLowerCase().includes("lagu buka")) {
-                    laguBukaNum = row.c[1]?.v;
-                } else if (label.toLowerCase().includes("lagu tutup")) {
-                    laguTutupNum = row.c[1]?.v;
+                const value = row.c[2]?.v || ""; // Column 2 has the song number
+                
+                console.log(`Row ${i}: label="${label}", value="${value}"`);
+                
+                if (label.toLowerCase().includes("lagu buka") && !label.toLowerCase().includes("ss")) {
+                    laguBukaNum = row.c[2]?.v;
+                    console.log("Found Lagu Buka at row", i, "with value:", laguBukaNum);
+                } else if (label.toLowerCase().includes("lagu tutup") && !label.toLowerCase().includes("ss")) {
+                    laguTutupNum = row.c[2]?.v;
+                    console.log("Found Lagu Tutup at row", i, "with value:", laguTutupNum);
                 }
             }
             
@@ -251,6 +261,7 @@
                 
                 let currentSection = null;
                 const khotbahItems = []; // Buffer for khotbah items to reorder
+                const khotbahData = {}; // Store khotbah data by role name
 
                 // Skip header rows and process schedule rows
                 for (let i = 4; i < rows.length; i++) {
@@ -308,8 +319,9 @@
                     if (currentSection === "ssDewasa") {
                         ssDewaساList.appendChild(item);
                     } else if (currentSection === "khotbah") {
-                        // Buffer khotbah items for reordering
-                        khotbahItems.push({ role: displayRole, person: person, element: item });
+                        // Store khotbah data for custom ordering
+                        const roleKey = role.toLowerCase();
+                        khotbahData[roleKey] = { role: displayRole, person: person };
                     } else if (currentSection === "pelayanan") {
                         pelayananList.appendChild(item);
                     } else if (currentSection === "diakonia") {
@@ -317,45 +329,52 @@
                     }
                 }
 
-                // Reorder and append khotbah items (Pembicara after Lagu Pujian 2)
-                const pembicaraIndex = khotbahItems.findIndex(item => item.role.toLowerCase().includes("pembicara"));
-                const laguPujian2Index = khotbahItems.findIndex(item => item.role.toLowerCase().includes("lagu pujian 2") || item.role.toLowerCase().includes("lagu pujian ii"));
+                // Build khotbah section in specific order
+                const createKhotbahItem = (label, value) => {
+                    const item = document.createElement("li");
+                    item.className = "list-group-item border-0 py-2 px-3";
+                    item.innerHTML = `
+                        <div class="flex justify-between items-center" style="font-size: 0.9rem;">
+                            <span class="font-semibold text-gray-700">${label}</span>
+                            <span class="text-gray-900">${value}</span>
+                        </div>
+                    `;
+                    return item;
+                };
+
+                // Get persons from khotbah data
+                const bacaanPersembahan = khotbahData['bacaan persembahan']?.person || '';
+                const pembicara = khotbahData['pembicara']?.person || '';
+                const ayatBersahutan = khotbahData['ayat bersahutan']?.person || '';
+                const khotbahTitle = khotbahData['khotbah']?.person || '';
                 
-                if (pembicaraIndex !== -1 && laguPujian2Index !== -1 && pembicaraIndex < laguPujian2Index) {
-                    // Move pembicara after lagu pujian 2
-                    const pembicaraItem = khotbahItems.splice(pembicaraIndex, 1)[0];
-                    khotbahItems.splice(laguPujian2Index, 0, pembicaraItem);
-                }
-                
-                // Append all khotbah items in the correct order
-                khotbahItems.forEach(item => {
-                    khotbahList.appendChild(item.element);
+                // Build in specified order
+                const orderedItems = [
+                    { label: 'Lagu Partisipan Khotbah', value: laguSionMap[421] ? `LSEL no. 421 - ${laguSionMap[421]}` : 'LSEL 421' },
+                    { label: 'Lagu Pembuka', value: laguBukaNum && laguSionMap[laguBukaNum] ? `LSEL no. ${laguBukaNum} - ${laguSionMap[laguBukaNum]}` : '' },
+                    { label: 'Doa Syafaat', value: khotbahData['doa syafaat']?.person || '' },
+                    { label: 'Bacaan Persembahan', value: bacaanPersembahan },
+                    { label: 'Lagu Persembahan', value: 'Instrumental' },
+                    { label: 'Lagu Sambutan', value: laguSionMap[21] ? `LSEL no. 21 - ${laguSionMap[21]}` : 'LSEL 21' },
+                    { label: 'Doa Persembahan', value: bacaanPersembahan },
+                    { label: 'Lagu Pujian', value: khotbahData['lagu pujian']?.person || khotbahData['lagu pujian 1']?.person || '-' },
+                    { label: 'Cerita Anak', value: khotbahData['cerita anak']?.person || '' },
+                    { label: 'Lagu Pujian', value: khotbahData['lagu pujian 2']?.person || '' },
+                    { label: 'Ayat Bersahutan', value: ayatBersahutan },
+                    { label: 'Ayat Inti', value: ayatBersahutan },
+                    { label: 'Lagu Sambutan Khotbah', value: laguSionMap[524] ? `LSEL no. 524 - ${laguSionMap[524]}` : 'LSEL 524' },
+                    { label: 'Doa Pendek', value: pembicara },
+                    { label: 'Khotbah', value: khotbahTitle || pembicara },
+                    { label: 'Lagu Penutup', value: laguSionMap[302] ? `LSEL no. 302 - ${laguSionMap[302]}` : 'LSEL 302' },
+                    { label: 'Doa Penutup', value: pembicara },
+                    { label: 'Lagu Sambutan', value: laguSionMap[168] ? `LSEL no. 168 - ${laguSionMap[168]}` : 'LSEL 168' }
+                ];
+
+                orderedItems.forEach(item => {
+                    if (item.value) {
+                        khotbahList.appendChild(createKhotbahItem(item.label, item.value));
+                    }
                 });
-                
-                // Add Lagu Buka and Lagu Tutup at the end of khotbah section
-                if (laguBukaNum && laguSionMap[laguBukaNum]) {
-                    const laguBukaItem = document.createElement("li");
-                    laguBukaItem.className = "list-group-item border-0 py-2 px-3";
-                    laguBukaItem.innerHTML = `
-                        <div class="flex justify-between items-center" style="font-size: 0.9rem;">
-                            <span class="font-semibold text-gray-700">Lagu Buka</span>
-                            <span class="text-gray-900">LSEL no. ${laguBukaNum} - ${laguSionMap[laguBukaNum]}</span>
-                        </div>
-                    `;
-                    khotbahList.appendChild(laguBukaItem);
-                }
-                
-                if (laguTutupNum && laguSionMap[laguTutupNum]) {
-                    const laguTutupItem = document.createElement("li");
-                    laguTutupItem.className = "list-group-item border-0 py-2 px-3";
-                    laguTutupItem.innerHTML = `
-                        <div class="flex justify-between items-center" style="font-size: 0.9rem;">
-                            <span class="font-semibold text-gray-700">Lagu Tutup</span>
-                            <span class="text-gray-900">LSEL no. ${laguTutupNum} - ${laguSionMap[laguTutupNum]}</span>
-                        </div>
-                    `;
-                    khotbahList.appendChild(laguTutupItem);
-                }
             })
             .catch(err => {
                 console.error(err);
