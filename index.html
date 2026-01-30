@@ -46,6 +46,12 @@
                 <ul id="pelayananList" class="list-group list-group-flush"></ul>
             </div>
         </div>
+
+        <div class="text-center mt-4">
+            <a href="https://wa.me/628119700888" target="_blank" class="btn btn-success" style="background-color: #25D366; border-color: #25D366; font-size: 0.95rem; padding: 0.6rem 1.5rem;">
+                <i class="bi bi-whatsapp"></i> Hubungi Dept. Komunikasi
+            </a>
+        </div>
     </div>
 
     <script>
@@ -237,7 +243,7 @@
                     } else if (role.includes("KHOTBAH")) {
                         currentSection = "khotbah";
                         continue;
-                    } else if (role.toLowerCase().includes("diakon koordinator") || role.toLowerCase().includes("diakon koor")) {
+                    } else if (role.toLowerCase().includes("diakon") || role.toLowerCase().includes("diakones") || role.toLowerCase().includes("bwa")) {
                         currentSection = "diakonia";
                     } else if (role.toLowerCase().includes("pelayanan musik") || role.toLowerCase().includes("pianist") || role.toLowerCase().includes("keyboardist")) {
                         if (!currentSection || currentSection !== "pelayanan") {
