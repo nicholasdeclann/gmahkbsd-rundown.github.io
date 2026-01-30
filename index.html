@@ -148,17 +148,17 @@
             
             // Find lagu buka and lagu tutup from the kertas acara sheet
             // Structure: Column 1 = Label, Column 2 = Song Number for Khotbah
-            //            Column 7 = SS Label, Column 8 = Song Number for SS
+            //            Column 8 = SS Label, Column 9 = Song Number for SS
             for (let i = 0; i < kertasAcaraRows.length; i++) {
                 const row = kertasAcaraRows[i];
                 if (!row.c) continue;
                 const label = row.c[1]?.v || "";
                 
                 if (label.toLowerCase() === "lagu buka") {
-                    laguBukaNum = row.c[2]?.v; // Column 2 has khotbah song number
-                    laguBukaSSNum = row.c[8]?.v; // Column 8 has SS song number
+                    laguBukaNum = row.c[2]?.v; // Column 2 has khotbah song number (88)
+                    laguBukaSSNum = row.c[9]?.v; // Column 9 has SS song number (478)
                 } else if (label.toLowerCase() === "lagu tutup") {
-                    laguTutupNum = row.c[2]?.v; // Column 2 has khotbah song number
+                    laguTutupNum = row.c[2]?.v; // Column 2 has khotbah song number (302)
                     // SS closing song is hardcoded per user request
                 }
             }
