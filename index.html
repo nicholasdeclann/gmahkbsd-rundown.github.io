@@ -19,8 +19,8 @@
         <div class="text-center mb-3 mb-md-4">
             <img src="GMAHK BSD.png" alt="GMAHK BSD" class="mx-auto mb-2 mb-md-3" style="max-width: 150px;">
             <h1 class="font-bold" style="font-size: 1.5rem;">Kertas Acara GMAHK BSD</h1>
-            <h2 class="text-gray-700 mt-1 mt-md-2" style="font-size: 1.1rem;" id="scheduleDate">Loading...</h2>
-            <p class="text-gray-500" style="font-size: 0.75rem;" id="lastUpdated">Loading...</p>
+            <h2 class="text-gray-700 mt-1 mt-md-2" style="font-size: 1.1rem;" id="scheduleDate">Memuat...</h2>
+            <p class="text-gray-500" style="font-size: 0.75rem;" id="lastUpdated">Memuat...</p>
         </div>
 
         <div id="scheduleContainer">
@@ -29,6 +29,9 @@
             </div>
             <div class="mb-3 mb-md-4">
                 <ul id="khotbahList" class="list-group list-group-flush"></ul>
+            </div>
+            <div class="mb-3 mb-md-4">
+                <ul id="diakoniaList" class="list-group list-group-flush"></ul>
             </div>
             <div class="mb-3 mb-md-4">
                 <ul id="pelayananList" class="list-group list-group-flush"></ul>
@@ -58,6 +61,23 @@
             return `${day} ${month}`;
         }
 
+        // Get which Saturday of the month (1st, 2nd, 3rd, 4th, 5th)
+        function getSaturdayOfMonth(date) {
+            const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+            const firstSaturday = new Date(firstDayOfMonth);
+            
+            // Find the first Saturday of the month
+            const dayOfWeek = firstDayOfMonth.getDay();
+            const daysUntilSaturday = (6 - dayOfWeek + 7) % 7;
+            firstSaturday.setDate(1 + daysUntilSaturday);
+            
+            // Calculate which Saturday this date is
+            const daysDiff = Math.floor((date - firstSaturday) / (1000 * 60 * 60 * 24));
+            const saturdayNumber = Math.floor(daysDiff / 7) + 1;
+            
+            return saturdayNumber;
+        }
+
         fetch(SHEET_URL)
             .then(res => res.text())
             .then(text => {
@@ -83,7 +103,9 @@
                 // Get this Saturday's date
                 const thisSaturday = getThisWeeksSaturday();
                 const targetDate = formatDate(thisSaturday);
+                const saturdayNumber = getSaturdayOfMonth(thisSaturday);
                 console.log("Looking for date:", targetDate);
+                console.log("Saturday of month:", saturdayNumber);
 
                 // Find the column index for this week's Saturday
                 const dateRow = rows[0]; // Row with dates (TANGGAL row)
@@ -109,30 +131,35 @@
                 }
 
                 if (columnIndex === -1) {
-                    document.getElementById("scheduleDate").innerHTML = `<span class='text-warning'>No schedule found for ${targetDate}</span>`;
+                    document.getElementById("scheduleDate").innerHTML = `<span class='text-warning'>Jadwal tidak ditemukan untuk ${targetDate}</span>`;
                     return;
                 }
 
                 // Display the schedule date as subtitle
-                document.getElementById("scheduleDate").textContent = `Schedule for ${targetDate}`;
+                document.getElementById("scheduleDate").textContent = `Sabat, ${targetDate}`;
 
                 // Get list containers
                 const ssDewaساList = document.getElementById("ssDewaساList");
                 const khotbahList = document.getElementById("khotbahList");
                 const pelayananList = document.getElementById("pelayananList");
+                const diakoniaList = document.getElementById("diakoniaList");
 
                 // Add headers for each section
                 ssDewaساList.innerHTML = `<li class='list-group-item bg-white text-center border-0 border-bottom py-2' style='border-bottom: 1px solid #dee2e6 !important;'>
-                    <h4 class="font-bold mb-0" style="color: #2e6ce8; font-size: 1rem;">SS DEWASA</h4>
+                    <h4 class="font-bold mb-0" style="color: #2e6ce8; font-size: 1rem;">Sekolah Sabat</h4>
                 </li>`;
                 khotbahList.innerHTML = `<li class='list-group-item bg-white text-center border-0 border-bottom py-2' style='border-bottom: 1px solid #dee2e6 !important;'>
-                    <h4 class="font-bold mb-0" style="color: #2e6ce8; font-size: 1rem;">KHOTBAH</h4>
+                    <h4 class="font-bold mb-0" style="color: #2e6ce8; font-size: 1rem;">Khotbah</h4>
                 </li>`;
                 pelayananList.innerHTML = `<li class='list-group-item bg-white text-center border-0 border-bottom py-2' style='border-bottom: 1px solid #dee2e6 !important;'>
-                    <h4 class="font-bold mb-0" style="color: #2e6ce8; font-size: 1rem;">PELAYANAN MUSIK</h4>
+                    <h4 class="font-bold mb-0" style="color: #2e6ce8; font-size: 1rem;">Pelayanan Musik</h4>
                 </li>`;
-
+                diakoniaList.innerHTML = `<li class='list-group-item bg-white text-center border-0 border-bottom py-2' style='border-bottom: 1px solid #dee2e6 !important;'>
+                    <h4 class="font-bold mb-0" style="color: #2e6ce8; font-size: 1rem;">Diakonia</h4>
+                </li>`;
+                
                 let currentSection = null;
+                const khotbahItems = []; // Buffer for khotbah items to reorder
 
                 // Skip header rows and process schedule rows
                 for (let i = 4; i < rows.length; i++) {
@@ -149,6 +176,8 @@
                     } else if (role.includes("KHOTBAH")) {
                         currentSection = "khotbah";
                         continue;
+                    } else if (role.toLowerCase().includes("diakon koordinator") || role.toLowerCase().includes("diakon koor")) {
+                        currentSection = "diakonia";
                     } else if (role.toLowerCase().includes("pelayanan musik") || role.toLowerCase().includes("pianist") || role.toLowerCase().includes("keyboardist")) {
                         if (!currentSection || currentSection !== "pelayanan") {
                             currentSection = "pelayanan";
@@ -158,12 +187,26 @@
                     // Skip empty roles
                     if (!role || !person) continue;
 
+                    // Handle Dor. PP/RT/Kesehatan based on Saturday of the month
+                    let displayRole = role;
+                    if (role.toLowerCase().includes("dor") && (role.toLowerCase().includes("pp") || role.toLowerCase().includes("rt") || role.toLowerCase().includes("kesehatan"))) {
+                        if (saturdayNumber === 1 || saturdayNumber === 3 || saturdayNumber === 5) {
+                            displayRole = "Dorongan PP";
+                        } else if (saturdayNumber === 2) {
+                            displayRole = "Rumah Tangga";
+                        } else if (saturdayNumber === 4) {
+                            displayRole = "Kesehatan";
+                        }
+                    }
+
                     const item = document.createElement("li");
                     item.className = "list-group-item border-0 py-2 px-3";
                     item.innerHTML = `
                         <div class="flex justify-between items-center" style="font-size: 0.9rem;">
-                            <span class="font-semibold text-gray-700">${role}</span>
-                            <span class="text-gray-900">${person}</span>
+                            <div>
+                                <span class="font-semibold text-gray-700">${displayRole}</span>
+                                <span class="text-gray-900">${person}</span>
+                            </div>
                         </div>
                     `;
 
@@ -171,16 +214,34 @@
                     if (currentSection === "ssDewasa") {
                         ssDewaساList.appendChild(item);
                     } else if (currentSection === "khotbah") {
-                        khotbahList.appendChild(item);
+                        // Buffer khotbah items for reordering
+                        khotbahItems.push({ role: displayRole, person: person, element: item });
                     } else if (currentSection === "pelayanan") {
                         pelayananList.appendChild(item);
+                    } else if (currentSection === "diakonia") {
+                        diakoniaList.appendChild(item);
                     }
                 }
+
+                // Reorder and append khotbah items (Pembicara after Lagu Pujian 2)
+                const pembicaraIndex = khotbahItems.findIndex(item => item.role.toLowerCase().includes("pembicara"));
+                const laguPujian2Index = khotbahItems.findIndex(item => item.role.toLowerCase().includes("lagu pujian 2") || item.role.toLowerCase().includes("lagu pujian ii"));
+                
+                if (pembicaraIndex !== -1 && laguPujian2Index !== -1 && pembicaraIndex < laguPujian2Index) {
+                    // Move pembicara after lagu pujian 2
+                    const pembicaraItem = khotbahItems.splice(pembicaraIndex, 1)[0];
+                    khotbahItems.splice(laguPujian2Index, 0, pembicaraItem);
+                }
+                
+                // Append all khotbah items in the correct order
+                khotbahItems.forEach(item => {
+                    khotbahList.appendChild(item.element);
+                });
             })
             .catch(err => {
                 console.error(err);
-                document.getElementById("scheduleList").innerHTML =
-                    "<li class='list-group-item text-danger'>Failed to load schedule</li>";
+                document.getElementById("scheduleDate").innerHTML =
+                    "<span class='text-danger'>Gagal memuat jadwal</span>";
             });
     </script>
 
