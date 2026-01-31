@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kertas Acara GMAHK BSD</title>
+    <title>GMAHK BSD - Kertas Acara</title>
 
     <!-- Bootstrap -->
     <link
@@ -71,11 +71,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
       <div class="container">
         <a class="navbar-brand" href="#">
-          <img
-            src="GMAHK BSD.png"
-            alt="GMAHK BSD"
-            style="height: 40px;"
-          />
+          <img src="GMAHK BSD.png" alt="GMAHK BSD" style="height: 40px" />
         </a>
         <button
           class="navbar-toggler"
@@ -91,13 +87,27 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="index.html" style="color: #2e6ce8; font-weight: 500;">
+              <a
+                class="nav-link active"
+                aria-current="page"
+                href="index.html"
+                style="color: #2e6ce8; font-weight: 500"
+              >
                 Kertas Acara
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="ulang-tahun.html" style="color: #6c757d;">
+              <a
+                class="nav-link"
+                href="ulang-tahun.html"
+                style="color: #6c757d"
+              >
                 Ulang Tahun
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="info.html" style="color: #6c757d">
+                Info
               </a>
             </li>
           </ul>
@@ -110,6 +120,27 @@
         <h1 class="font-bold content-animate" style="font-size: 1.5rem">
           Kertas Acara GMAHK BSD
         </h1>
+
+        <div
+          class="d-flex justify-content-center align-items-center mb-3 delayed-content"
+          style="gap: 1rem"
+        >
+          <button
+            id="thisWeek"
+            class="btn btn-outline-secondary"
+            style="font-size: 0.85rem"
+          >
+            Sabat Ini
+          </button>
+          <button
+            id="nextWeek"
+            class="btn btn-outline-primary"
+            style="font-size: 0.9rem"
+          >
+            Sabat Depan <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
+
         <h2
           class="text-gray-700 mt-1 mt-md-2 content-animate"
           style="font-size: 1.1rem"
@@ -128,26 +159,6 @@
         ></p>
       </div>
 
-      <div
-        class="d-flex justify-content-center align-items-center mb-3 delayed-content"
-        style="gap: 1rem"
-      >
-        <button
-          id="thisWeek"
-          class="btn btn-outline-secondary"
-          style="font-size: 0.85rem"
-        >
-          Sabat Ini
-        </button>
-        <button
-          id="nextWeek"
-          class="btn btn-outline-primary"
-          style="font-size: 0.9rem"
-        >
-          Sabat Depan <i class="bi bi-chevron-right"></i>
-        </button>
-      </div>
-
       <div id="scheduleContainer" class="delayed-content">
         <div class="mb-3 mb-md-4">
           <ul id="ssDewaساList" class="list-group list-group-flush"></ul>
@@ -161,54 +172,6 @@
         <div class="mb-3 mb-md-4">
           <ul id="pelayananList" class="list-group list-group-flush"></ul>
         </div>
-      </div>
-
-      <div class="text-center mt-4 delayed-content">
-        <a
-          href="https://www.canva.com/design/DAG-9nAgcSE/xxLYrc05ZBMZ81c284JgMA/view?utm_content=DAG-9nAgcSE&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h4ccefbb367"
-          target="_blank"
-          class="btn btn-primary"
-          style="
-            background-color: #2e6ce8;
-            border-color: #2e6ce8;
-            font-size: 0.95rem;
-            padding: 0.6rem 1.5rem;
-          "
-        >
-          <i class="bi bi-megaphone"></i> Pengumuman
-        </a>
-      </div>
-
-      <div class="text-center mt-3 delayed-content">
-        <a
-          href="https://wa.me/628119700888"
-          target="_blank"
-          class="btn btn-success"
-          style="
-            background-color: #25d366;
-            border-color: #25d366;
-            font-size: 0.95rem;
-            padding: 0.6rem 1.5rem;
-          "
-        >
-          <i class="bi bi-whatsapp"></i> Dept. Komunikasi
-        </a>
-      </div>
-
-      <div class="text-center mt-3 delayed-content">
-        <a
-          href="https://wa.me/6289533762770"
-          target="_blank"
-          class="btn btn-success"
-          style="
-            background-color: #25d366;
-            border-color: #25d366;
-            font-size: 0.95rem;
-            padding: 0.6rem 1.5rem;
-          "
-        >
-          <i class="bi bi-whatsapp"></i> Pdt. Eko Surono
-        </a>
       </div>
     </div>
 
@@ -544,19 +507,19 @@
           if (person2) {
             // Create item with two people displayed vertically
             item.innerHTML = `
-                        <div class="flex justify-between" style="font-size: 0.9rem;">
-                            <span class="font-semibold text-gray-700">${displayRole}</span>
-                            <div class="text-right" style="text-align: right;">
-                                <div class="text-gray-900">${person}</div>
-                                <div class="text-gray-900">${person2}</div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
+                            <span style="font-weight: 600; color: #6c757d;">${displayRole}</span>
+                            <div style="text-align: right;">
+                                <div style="color: #111827;">${person}</div>
+                                <div style="color: #111827;">${person2}</div>
                             </div>
                         </div>
                     `;
           } else {
             item.innerHTML = `
-                        <div class="flex justify-between items-center" style="font-size: 0.9rem;">
-                            <span class="font-semibold text-gray-700">${displayRole}</span>
-                            <span class="text-gray-900 text-right" style="text-align: right;">${person}</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
+                            <span style="font-weight: 600; color: #6c757d;">${displayRole}</span>
+                            <span style="color: #111827; text-align: right;">${person}</span>
                         </div>
                     `;
           }
@@ -588,9 +551,9 @@
           const valueColor = isLaguSion ? "#2e6ce8" : "#111827";
           const labelColor = isLaguSion ? "#2e6ce8" : "";
           item.innerHTML = `
-                    <div class="flex justify-between items-center" style="font-size: 0.9rem;">
-                        <span class="font-semibold text-gray-700" style="color: ${labelColor};">${label}</span>
-                        <span class="text-gray-900 text-right" style="color: ${valueColor}; text-align: right;">${value}</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
+                        <span style="color: ${labelColor}; font-weight: 600;">${label}</span>
+                        <span style="color: ${valueColor}; text-align: right;">${value}</span>
                     </div>
                 `;
           return item;
@@ -660,18 +623,18 @@
           if (middleValue) {
             // Three column layout
             item.innerHTML = `
-                        <div class="flex justify-between items-start" style="font-size: 0.9rem; gap: 1rem;">
-                            <span class="font-semibold text-gray-700" style="color: ${labelColor}; flex: 0 0 auto;">${label}</span>
-                            <span class="text-gray-700 text-center" style="flex: 1 1 auto; font-style: italic;">${middleValue}</span>
-                            <span class="text-gray-900 text-right" style="color: ${valueColor}; text-align: right; flex: 0 0 auto;">${value}</span>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; font-size: 0.9rem; gap: 1rem;">
+                            <span style="color: ${labelColor}; flex: 0 0 auto; font-weight: 600;">${label}</span>
+                            <span style="color: #6c757d; flex: 1 1 auto; text-align: center; font-style: italic;">${middleValue}</span>
+                            <span style="color: ${valueColor}; text-align: right; flex: 0 0 auto;">${value}</span>
                         </div>
                     `;
           } else {
             // Two column layout (original)
             item.innerHTML = `
-                        <div class="flex justify-between items-center" style="font-size: 0.9rem;">
-                            <span class="font-semibold text-gray-700" style="color: ${labelColor};">${label}</span>
-                            <span class="text-gray-900 text-right" style="color: ${valueColor}; text-align: right;">${value}</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;">
+                            <span style="color: ${labelColor}; font-weight: 600;">${label}</span>
+                            <span style="color: ${valueColor}; text-align: right;">${value}</span>
                         </div>
                     `;
           }
