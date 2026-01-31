@@ -1,345 +1,549 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kertas Acara GMAHK BSD</title>
 
     <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-    
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
     <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
 
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+    <style>
+      @keyframes logoEntrance {
+        0% {
+          transform: translateY(calc(50vh - 50%));
+          opacity: 0;
+        }
+        30% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
 
-<body class="bg-white">
+      @keyframes fadeInContent {
+        0% {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .logo-animate {
+        animation: logoEntrance 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      }
+
+      .content-animate {
+        opacity: 0;
+        animation: fadeInContent 0.8s cubic-bezier(0.4, 0, 0.2, 1) 1.2s forwards;
+      }
+
+      .delayed-content {
+        opacity: 0;
+        animation: fadeInContent 0.8s cubic-bezier(0.4, 0, 0.2, 1) 1.5s forwards;
+      }
+
+      .navbar {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+
+      .nav-link:hover {
+        color: #2e6ce8 !important;
+      }
+    </style>
+  </head>
+
+  <body class="bg-white">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+      <div class="container">
+        <a class="navbar-brand" href="#">
+          <img
+            src="GMAHK BSD.png"
+            alt="GMAHK BSD"
+            style="height: 40px;"
+          />
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="index.html" style="color: #2e6ce8; font-weight: 500;">
+                Kertas Acara
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="ulang-tahun.html" style="color: #6c757d;">
+                Ulang Tahun
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
 
     <div class="container py-3 py-md-5 px-3">
-        <div class="text-center mb-3 mb-md-4">
-            <img src="GMAHK BSD.png" alt="GMAHK BSD" class="mx-auto mb-2 mb-md-3" style="max-width: 150px;">
-            <h1 class="font-bold" style="font-size: 1.5rem;">Kertas Acara GMAHK BSD</h1>
-            <h2 class="text-gray-700 mt-1 mt-md-2" style="font-size: 1.1rem;" id="scheduleDate"><span class="spinner-border spinner-border-sm" role="status" style="color: #2e6ce8;"></span></h2>
-            <p class="text-gray-500" style="font-size: 0.75rem;" id="lastUpdated"></p>
-        </div>
+      <div class="text-center mb-3 mb-md-4">
+        <h1 class="font-bold content-animate" style="font-size: 1.5rem">
+          Kertas Acara GMAHK BSD
+        </h1>
+        <h2
+          class="text-gray-700 mt-1 mt-md-2 content-animate"
+          style="font-size: 1.1rem"
+          id="scheduleDate"
+        >
+          <span
+            class="spinner-border spinner-border-sm"
+            role="status"
+            style="color: #2e6ce8"
+          ></span>
+        </h2>
+        <p
+          class="text-gray-500 content-animate"
+          style="font-size: 0.75rem"
+          id="lastUpdated"
+        ></p>
+      </div>
 
-        <div id="scheduleContainer">
-            <div class="mb-3 mb-md-4">
-                <ul id="ssDewaساList" class="list-group list-group-flush"></ul>
-            </div>
-            <div class="mb-3 mb-md-4">
-                <ul id="khotbahList" class="list-group list-group-flush"></ul>
-            </div>
-            <div class="mb-3 mb-md-4">
-                <ul id="diakoniaList" class="list-group list-group-flush"></ul>
-            </div>
-            <div class="mb-3 mb-md-4">
-                <ul id="pelayananList" class="list-group list-group-flush"></ul>
-            </div>
-        </div>
+      <div
+        class="d-flex justify-content-center align-items-center mb-3 delayed-content"
+        style="gap: 1rem"
+      >
+        <button
+          id="thisWeek"
+          class="btn btn-outline-secondary"
+          style="font-size: 0.85rem"
+        >
+          Sabat Ini
+        </button>
+        <button
+          id="nextWeek"
+          class="btn btn-outline-primary"
+          style="font-size: 0.9rem"
+        >
+          Sabat Depan <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
 
-        <div class="d-flex justify-content-center align-items-center mb-3" style="gap: 1rem;">
-            <button id="thisWeek" class="btn btn-outline-secondary" style="font-size: 0.85rem;">
-                Sabat Ini
-            </button>
-            <button id="nextWeek" class="btn btn-outline-primary" style="font-size: 0.9rem;">
-                Sabat Depan <i class="bi bi-chevron-right"></i>
-            </button>
+      <div id="scheduleContainer" class="delayed-content">
+        <div class="mb-3 mb-md-4">
+          <ul id="ssDewaساList" class="list-group list-group-flush"></ul>
         </div>
+        <div class="mb-3 mb-md-4">
+          <ul id="khotbahList" class="list-group list-group-flush"></ul>
+        </div>
+        <div class="mb-3 mb-md-4">
+          <ul id="diakoniaList" class="list-group list-group-flush"></ul>
+        </div>
+        <div class="mb-3 mb-md-4">
+          <ul id="pelayananList" class="list-group list-group-flush"></ul>
+        </div>
+      </div>
 
-        <div class="text-center mt-4">
-            <a href="https://www.canva.com/design/DAG-9nAgcSE/xxLYrc05ZBMZ81c284JgMA/view?utm_content=DAG-9nAgcSE&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h4ccefbb367" target="_blank" class="btn btn-primary" style="background-color: #2e6ce8; border-color: #2e6ce8; font-size: 0.95rem; padding: 0.6rem 1.5rem;">
-                <i class="bi bi-megaphone"></i> Pengumuman Komunikasi
-            </a>
-        </div>
-        
-        <div class="text-center mt-3">
-            <a href="https://wa.me/628119700888" target="_blank" class="btn btn-success" style="background-color: #25D366; border-color: #25D366; font-size: 0.95rem; padding: 0.6rem 1.5rem;">
-                <i class="bi bi-whatsapp"></i> Kontak Dept. Komunikasi
-            </a>
-        </div>
+      <div class="text-center mt-4 delayed-content">
+        <a
+          href="https://www.canva.com/design/DAG-9nAgcSE/xxLYrc05ZBMZ81c284JgMA/view?utm_content=DAG-9nAgcSE&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h4ccefbb367"
+          target="_blank"
+          class="btn btn-primary"
+          style="
+            background-color: #2e6ce8;
+            border-color: #2e6ce8;
+            font-size: 0.95rem;
+            padding: 0.6rem 1.5rem;
+          "
+        >
+          <i class="bi bi-megaphone"></i> Pengumuman
+        </a>
+      </div>
+
+      <div class="text-center mt-3 delayed-content">
+        <a
+          href="https://wa.me/628119700888"
+          target="_blank"
+          class="btn btn-success"
+          style="
+            background-color: #25d366;
+            border-color: #25d366;
+            font-size: 0.95rem;
+            padding: 0.6rem 1.5rem;
+          "
+        >
+          <i class="bi bi-whatsapp"></i> Dept. Komunikasi
+        </a>
+      </div>
+
+      <div class="text-center mt-3 delayed-content">
+        <a
+          href="https://wa.me/6289533762770"
+          target="_blank"
+          class="btn btn-success"
+          style="
+            background-color: #25d366;
+            border-color: #25d366;
+            font-size: 0.95rem;
+            padding: 0.6rem 1.5rem;
+          "
+        >
+          <i class="bi bi-whatsapp"></i> Pdt. Eko Surono
+        </a>
+      </div>
     </div>
 
     <script>
-        const SHEET_ID = "1P4tHksUSd-cYVcU-mYQYvutL-c1S-V2Nj1hlb-yR28w";
-        const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
-        
-        const SHEET_ID_2 = "1uW-CwZxGJ9Jfqv78pUc-4iE9fqgrV17eV9Ws_FEE5Ns";
-        const KERTAS_ACARA_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID_2}/gviz/tq?tqx=out:json&gid=1587228396`;
-        const LAGU_SION_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID_2}/gviz/tq?tqx=out:json&gid=1174681408`;
+      const SHEET_ID = "1P4tHksUSd-cYVcU-mYQYvutL-c1S-V2Nj1hlb-yR28w";
+      const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
 
-        // Get this week's Saturday (or next Saturday if today is Sunday)
-        // Track which column offset to use (0 = this week, 1 = next week)
-        let columnOffset = parseInt(localStorage.getItem('columnOffset') || '0');
-        
-        function getThisWeeksSaturday() {
-            const today = new Date();
-            const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
-            
-            let daysUntilSaturday;
-            if (dayOfWeek === 0) {
-                // Sunday: show next Saturday (6 days away)
-                daysUntilSaturday = 6;
-            } else if (dayOfWeek === 6) {
-                // Saturday: show today (0 days)
-                daysUntilSaturday = 0;
-            } else {
-                // Mon-Fri: show this week's Saturday
-                daysUntilSaturday = 6 - dayOfWeek;
-            }
-            
-            const saturday = new Date(today);
-            saturday.setDate(today.getDate() + daysUntilSaturday + (columnOffset * 7));
-            return saturday;
+      const SHEET_ID_2 = "1uW-CwZxGJ9Jfqv78pUc-4iE9fqgrV17eV9Ws_FEE5Ns";
+      const KERTAS_ACARA_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID_2}/gviz/tq?tqx=out:json&gid=1587228396`;
+      const LAGU_SION_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID_2}/gviz/tq?tqx=out:json&gid=1174681408`;
+
+      // Get this week's Saturday (or next Saturday if today is Sunday)
+      // Track which column offset to use (0 = this week, 1 = next week)
+      let columnOffset = parseInt(localStorage.getItem("columnOffset") || "0");
+
+      function getThisWeeksSaturday() {
+        const today = new Date();
+        const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
+
+        let daysUntilSaturday;
+        if (dayOfWeek === 0) {
+          // Sunday: show next Saturday (6 days away)
+          daysUntilSaturday = 6;
+        } else if (dayOfWeek === 6) {
+          // Saturday: show today (0 days)
+          daysUntilSaturday = 0;
+        } else {
+          // Mon-Fri: show this week's Saturday
+          daysUntilSaturday = 6 - dayOfWeek;
         }
 
-        // Format date as "DD MMM" (e.g., "31 Jan")
-        function formatDate(date) {
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const day = date.getDate().toString().padStart(2, '0');
-            const month = months[date.getMonth()];
-            return `${day} ${month}`;
-        }
+        const saturday = new Date(today);
+        saturday.setDate(
+          today.getDate() + daysUntilSaturday + columnOffset * 7,
+        );
+        return saturday;
+      }
 
-        // Get which Saturday of the month (1st, 2nd, 3rd, 4th, 5th)
-        function getSaturdayOfMonth(date) {
-            const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-            const firstSaturday = new Date(firstDayOfMonth);
-            
-            // Find the first Saturday of the month
-            const dayOfWeek = firstDayOfMonth.getDay();
-            const daysUntilSaturday = (6 - dayOfWeek + 7) % 7;
-            firstSaturday.setDate(1 + daysUntilSaturday);
-            
-            // Calculate which Saturday this date is
-            const daysDiff = Math.floor((date - firstSaturday) / (1000 * 60 * 60 * 24));
-            const saturdayNumber = Math.floor(daysDiff / 7) + 1;
-            
-            return saturdayNumber;
-        }
+      // Format date as "DD MMM" (e.g., "31 Jan")
+      function formatDate(date) {
+        const months = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ];
+        const day = date.getDate().toString().padStart(2, "0");
+        const month = months[date.getMonth()];
+        return `${day} ${month}`;
+      }
 
-        // Fetch Lagu Sion data and create lookup map
-        let laguSionMap = {};
-        let cachedRows = null;
-        let laguBukaNum = null;
-        let laguTutupNum = null;
-        let laguBukaSSNum = null;
-        let laguTutupSSNum = null;
-        let judulKhotbah = null;
-        let ayatInti = null;
-        let ayatBersahutanText = null;
-        
-        Promise.all([
-            fetch(LAGU_SION_URL).then(res => res.text()),
-            fetch(KERTAS_ACARA_URL).then(res => res.text()),
-            fetch(SHEET_URL).then(res => res.text())
-        ]).then(([laguSionText, kertasAcaraText, sheetText]) => {
-            // Parse Lagu Sion data
-            const laguSionJson = JSON.parse(laguSionText.substring(47, laguSionText.length - 2));
-            const laguSionRows = laguSionJson.table.rows;
-            
-            // Build Lagu Sion lookup map
-            for (let row of laguSionRows) {
-                if (!row.c) continue;
-                const num = row.c[1]?.v;
-                const title = row.c[2]?.v;
-                if (num && title) {
-                    laguSionMap[num] = title;
-                }
+      // Get which Saturday of the month (1st, 2nd, 3rd, 4th, 5th)
+      function getSaturdayOfMonth(date) {
+        const firstDayOfMonth = new Date(
+          date.getFullYear(),
+          date.getMonth(),
+          1,
+        );
+        const firstSaturday = new Date(firstDayOfMonth);
+
+        // Find the first Saturday of the month
+        const dayOfWeek = firstDayOfMonth.getDay();
+        const daysUntilSaturday = (6 - dayOfWeek + 7) % 7;
+        firstSaturday.setDate(1 + daysUntilSaturday);
+
+        // Calculate which Saturday this date is
+        const daysDiff = Math.floor(
+          (date - firstSaturday) / (1000 * 60 * 60 * 24),
+        );
+        const saturdayNumber = Math.floor(daysDiff / 7) + 1;
+
+        return saturdayNumber;
+      }
+
+      // Fetch Lagu Sion data and create lookup map
+      let laguSionMap = {};
+      let cachedRows = null;
+      let laguBukaNum = null;
+      let laguTutupNum = null;
+      let laguBukaSSNum = null;
+      let laguTutupSSNum = null;
+      let judulKhotbah = null;
+      let ayatInti = null;
+      let ayatBersahutanText = null;
+
+      Promise.all([
+        fetch(LAGU_SION_URL).then((res) => res.text()),
+        fetch(KERTAS_ACARA_URL).then((res) => res.text()),
+        fetch(SHEET_URL).then((res) => res.text()),
+      ])
+        .then(([laguSionText, kertasAcaraText, sheetText]) => {
+          // Parse Lagu Sion data
+          const laguSionJson = JSON.parse(
+            laguSionText.substring(47, laguSionText.length - 2),
+          );
+          const laguSionRows = laguSionJson.table.rows;
+
+          // Build Lagu Sion lookup map
+          for (let row of laguSionRows) {
+            if (!row.c) continue;
+            const num = row.c[1]?.v;
+            const title = row.c[2]?.v;
+            if (num && title) {
+              laguSionMap[num] = title;
             }
-            
-            // Parse Kertas Acara data to get lagu buka and lagu tutup
-            const kertasAcaraJson = JSON.parse(kertasAcaraText.substring(47, kertasAcaraText.length - 2));
-            const kertasAcaraRows = kertasAcaraJson.table.rows;
-            
-            // Find lagu buka and lagu tutup from the kertas acara sheet
-            // Structure: Column 1 = Label, Column 2 = Song Number for Khotbah
-            //            Column 8 = SS Label, Column 9 = Song Number for SS
-            for (let i = 0; i < kertasAcaraRows.length; i++) {
-                const row = kertasAcaraRows[i];
-                if (!row.c) continue;
-                const label = row.c[1]?.v || "";
-                
-                if (label.toLowerCase() === "lagu buka") {
-                    laguBukaNum = row.c[2]?.v; // Column 2 has khotbah song number (88)
-                    laguBukaSSNum = row.c[9]?.v; // Column 9 has SS song number (478)
-                } else if (label.toLowerCase() === "lagu tutup") {
-                    laguTutupNum = row.c[2]?.v; // Column 2 has khotbah song number (302)
-                    // SS closing song is hardcoded per user request
-                } else if (label.toLowerCase() === "judul khotbah") {
-                    judulKhotbah = row.c[2]?.v; // Column 3 has sermon title
-                } else if (label.toLowerCase() === "ayat inti") {
-                    ayatInti = row.c[2]?.v; // Column 3 has core verse
-                } else if (label.toLowerCase() === "ayat bersahutan") {
-                    ayatBersahutanText = row.c[2]?.v; // Column 3 has responsive verse
-                }
+          }
+
+          // Parse Kertas Acara data to get lagu buka and lagu tutup
+          const kertasAcaraJson = JSON.parse(
+            kertasAcaraText.substring(47, kertasAcaraText.length - 2),
+          );
+          const kertasAcaraRows = kertasAcaraJson.table.rows;
+
+          // Find lagu buka and lagu tutup from the kertas acara sheet
+          // Structure: Column 1 = Label, Column 2 = Song Number for Khotbah
+          //            Column 8 = SS Label, Column 9 = Song Number for SS
+          for (let i = 0; i < kertasAcaraRows.length; i++) {
+            const row = kertasAcaraRows[i];
+            if (!row.c) continue;
+            const label = row.c[1]?.v || "";
+
+            if (label.toLowerCase() === "lagu buka") {
+              laguBukaNum = row.c[2]?.v; // Column 2 has khotbah song number (88)
+              laguBukaSSNum = row.c[9]?.v; // Column 9 has SS song number (478)
+            } else if (label.toLowerCase() === "lagu tutup") {
+              laguTutupNum = row.c[2]?.v; // Column 2 has khotbah song number (302)
+              // SS closing song is hardcoded per user request
+            } else if (label.toLowerCase() === "judul khotbah") {
+              judulKhotbah = row.c[2]?.v; // Column 3 has sermon title
+            } else if (label.toLowerCase() === "ayat inti") {
+              ayatInti = row.c[2]?.v; // Column 3 has core verse
+            } else if (label.toLowerCase() === "ayat bersahutan") {
+              ayatBersahutanText = row.c[2]?.v; // Column 3 has responsive verse
             }
-            
-            // Hardcode SS closing song as per user requirement
-            laguTutupSSNum = null; // Will use fallback text "SDA Hymnal 602 - Setialah Saudara"
+          }
 
-            // Parse and cache the main schedule data
-            const json = JSON.parse(sheetText.substring(47, sheetText.length - 2));
-            cachedRows = json.table.rows;
+          // Hardcode SS closing song as per user requirement
+          laguTutupSSNum = null; // Will use fallback text "SDA Hymnal 602 - Setialah Saudara"
 
-            // Update timestamp when data is fetched
-            const now = new Date();
-            const timeString = now.toLocaleString('en-GB', { 
-                day: '2-digit', 
-                month: 'short', 
-                year: 'numeric', 
-                hour: '2-digit', 
-                minute: '2-digit',
-                hour12: false 
-            });
-            document.getElementById("lastUpdated").textContent = `Data partisipan diambil pada: ${timeString}`;
+          // Parse and cache the main schedule data
+          const json = JSON.parse(
+            sheetText.substring(47, sheetText.length - 2),
+          );
+          cachedRows = json.table.rows;
 
-            // Initial render
-            renderSchedule();
+          // Update timestamp when data is fetched
+          const now = new Date();
+          const timeString = now.toLocaleString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          });
+          document.getElementById("lastUpdated").textContent =
+            `Data partisipan diambil pada: ${timeString}`;
+
+          // Initial render
+          renderSchedule();
         })
-        .catch(err => {
-            document.getElementById("scheduleDate").innerHTML =
-                "<span class='text-danger'>Gagal memuat jadwal</span>";
+        .catch((err) => {
+          document.getElementById("scheduleDate").innerHTML =
+            "<span class='text-danger'>Gagal memuat jadwal</span>";
         });
 
-        // Function to render the schedule based on current columnOffset
-        function renderSchedule() {
-            if (!cachedRows) return;
-            
-            const rows = cachedRows;
+      // Function to render the schedule based on current columnOffset
+      function renderSchedule() {
+        if (!cachedRows) return;
 
-            // Get this Saturday's date
-            const thisSaturday = getThisWeeksSaturday();
-            const targetDate = formatDate(thisSaturday);
-            const saturdayNumber = getSaturdayOfMonth(thisSaturday);
+        const rows = cachedRows;
 
-            // Find the column index for this week's Saturday
-            const dateRow = rows[0]; // Row with dates (TANGGAL row)
-            let columnIndex = -1;
+        // Get this Saturday's date
+        const thisSaturday = getThisWeeksSaturday();
+        const targetDate = formatDate(thisSaturday);
+        const saturdayNumber = getSaturdayOfMonth(thisSaturday);
 
-            if (dateRow && dateRow.c) {
-                for (let i = 1; i < dateRow.c.length; i++) {
-                    const cellValue = dateRow.c[i]?.v || "";
-                    const formattedValue = dateRow.c[i]?.f || "";
-                    
-                    // Check both the value and formatted value
-                    const searchIn = cellValue + " " + formattedValue;
-                    if (searchIn.includes(targetDate.split(' ')[0]) && searchIn.includes(targetDate.split(' ')[1])) {
-                        columnIndex = i;
-                        break;
-                    }
-                }
+        // Find the column index for this week's Saturday
+        const dateRow = rows[0]; // Row with dates (TANGGAL row)
+        let columnIndex = -1;
+
+        if (dateRow && dateRow.c) {
+          for (let i = 1; i < dateRow.c.length; i++) {
+            const cellValue = dateRow.c[i]?.v || "";
+            const formattedValue = dateRow.c[i]?.f || "";
+
+            // Check both the value and formatted value
+            const searchIn = cellValue + " " + formattedValue;
+            if (
+              searchIn.includes(targetDate.split(" ")[0]) &&
+              searchIn.includes(targetDate.split(" ")[1])
+            ) {
+              columnIndex = i;
+              break;
             }
+          }
+        }
 
-            if (columnIndex === -1) {
-                document.getElementById("scheduleDate").innerHTML = `<span class='text-warning'>Jadwal tidak ditemukan untuk ${targetDate}</span>`;
-                return;
-            }
+        if (columnIndex === -1) {
+          document.getElementById("scheduleDate").innerHTML =
+            `<span class='text-warning'>Jadwal tidak ditemukan untuk ${targetDate}</span>`;
+          return;
+        }
 
-            // Display the schedule date as subtitle
-            document.getElementById("scheduleDate").textContent = `Sabat, ${targetDate}`;
+        // Display the schedule date as subtitle
+        document.getElementById("scheduleDate").textContent =
+          `Sabat, ${targetDate}`;
 
-            // Get list containers
-            const ssDewaساList = document.getElementById("ssDewaساList");
-            const khotbahList = document.getElementById("khotbahList");
-            const pelayananList = document.getElementById("pelayananList");
-            const diakoniaList = document.getElementById("diakoniaList");
+        // Get list containers
+        const ssDewaساList = document.getElementById("ssDewaساList");
+        const khotbahList = document.getElementById("khotbahList");
+        const pelayananList = document.getElementById("pelayananList");
+        const diakoniaList = document.getElementById("diakoniaList");
 
-            // Add headers for each section
-            ssDewaساList.innerHTML = `<li class='list-group-item bg-white text-center border-0 border-bottom py-2' style='border-bottom: 1px solid #dee2e6 !important;'>
+        // Add headers for each section
+        ssDewaساList.innerHTML = `<li class='list-group-item bg-white text-center border-0 border-bottom py-2' style='border-bottom: 1px solid #dee2e6 !important;'>
                 <h4 class="font-bold mb-0" style="color: #2e6ce8; font-size: 1rem;">Sekolah Sabat</h4>
             </li>`;
-            khotbahList.innerHTML = `<li class='list-group-item bg-white text-center border-0 border-bottom py-2' style='border-bottom: 1px solid #dee2e6 !important;'>
+        khotbahList.innerHTML = `<li class='list-group-item bg-white text-center border-0 border-bottom py-2' style='border-bottom: 1px solid #dee2e6 !important;'>
                 <h4 class="font-bold mb-0" style="color: #2e6ce8; font-size: 1rem;">Khotbah</h4>
             </li>`;
-            pelayananList.innerHTML = `<li class='list-group-item bg-white text-center border-0 border-bottom py-2' style='border-bottom: 1px solid #dee2e6 !important;'>
+        pelayananList.innerHTML = `<li class='list-group-item bg-white text-center border-0 border-bottom py-2' style='border-bottom: 1px solid #dee2e6 !important;'>
                 <h4 class="font-bold mb-0" style="color: #2e6ce8; font-size: 1rem;">Pelayanan Musik</h4>
             </li>`;
-            diakoniaList.innerHTML = `<li class='list-group-item bg-white text-center border-0 border-bottom py-2' style='border-bottom: 1px solid #dee2e6 !important;'>
+        diakoniaList.innerHTML = `<li class='list-group-item bg-white text-center border-0 border-bottom py-2' style='border-bottom: 1px solid #dee2e6 !important;'>
                 <h4 class="font-bold mb-0" style="color: #2e6ce8; font-size: 1rem;">Diakonia</h4>
             </li>`;
-            
-            let currentSection = null;
-            const khotbahItems = []; // Buffer for khotbah items to reorder
-            const khotbahData = {}; // Store khotbah data by role name
-            const ssData = {}; // Store SS data by role name
 
-            // Skip header rows and process schedule rows
-            let skipNextRow = false;
-            for (let i = 4; i < rows.length; i++) {
-                if (skipNextRow) {
-                    skipNextRow = false;
-                    continue;
-                }
-                
-                const row = rows[i];
-                if (!row.c) continue;
+        let currentSection = null;
+        const khotbahItems = []; // Buffer for khotbah items to reorder
+        const khotbahData = {}; // Store khotbah data by role name
+        const ssData = {}; // Store SS data by role name
 
-                const role = row.c[0]?.v || "";
-                const person = row.c[columnIndex]?.v || "";
+        // Skip header rows and process schedule rows
+        let skipNextRow = false;
+        for (let i = 4; i < rows.length; i++) {
+          if (skipNextRow) {
+            skipNextRow = false;
+            continue;
+          }
 
-                // Skip penyedia potluck and koordinator rows
-                if (role.toLowerCase().includes("penyedia potluck") || role.toLowerCase().includes("koordinator")) {
-                    continue;
-                }
+          const row = rows[i];
+          if (!row.c) continue;
 
-                // Determine which section we're in
-                if (role.includes("DEWASA")) {
-                    currentSection = "ssDewasa";
-                    continue;
-                } else if (role.includes("KHOTBAH")) {
-                    currentSection = "khotbah";
-                    continue;
-                } else if (role.toLowerCase().includes("diakon") || role.toLowerCase().includes("diakones") || role.toLowerCase().includes("bwa")) {
-                    currentSection = "diakonia";
-                } else if (role.toLowerCase().includes("pelayanan musik") || role.toLowerCase().includes("pianist") || role.toLowerCase().includes("keyboardist")) {
-                    if (!currentSection || currentSection !== "pelayanan") {
-                        currentSection = "pelayanan";
-                    }
-                }
+          const role = row.c[0]?.v || "";
+          const person = row.c[columnIndex]?.v || "";
 
-                // Skip empty roles
-                if (!role || !person) continue;
+          // Skip penyedia potluck and koordinator rows
+          if (
+            role.toLowerCase().includes("penyedia potluck") ||
+            role.toLowerCase().includes("koordinator")
+          ) {
+            continue;
+          }
 
-                // Handle Dor. PP/RT/Kesehatan based on Saturday of the month
-                let displayRole = role;
-                if (role.toLowerCase().includes("dor") && (role.toLowerCase().includes("pp") || role.toLowerCase().includes("rt") || role.toLowerCase().includes("kesehatan"))) {
-                    if (saturdayNumber === 1 || saturdayNumber === 3 || saturdayNumber === 5) {
-                        displayRole = "Dorongan PP";
-                    } else if (saturdayNumber === 2) {
-                        displayRole = "Rumah Tangga";
-                    } else if (saturdayNumber === 4) {
-                        displayRole = "Kesehatan";
-                    }
-                }
+          // Determine which section we're in
+          if (role.includes("DEWASA")) {
+            currentSection = "ssDewasa";
+            continue;
+          } else if (role.includes("KHOTBAH")) {
+            currentSection = "khotbah";
+            continue;
+          } else if (
+            role.toLowerCase().includes("diakon") ||
+            role.toLowerCase().includes("diakones") ||
+            role.toLowerCase().includes("bwa")
+          ) {
+            currentSection = "diakonia";
+          } else if (
+            role.toLowerCase().includes("pelayanan musik") ||
+            role.toLowerCase().includes("pianist") ||
+            role.toLowerCase().includes("keyboardist")
+          ) {
+            if (!currentSection || currentSection !== "pelayanan") {
+              currentSection = "pelayanan";
+            }
+          }
 
-                // Check if this is a multi-person role (Diakon Persembahan or Diakones & BWA)
-                const isMultiPersonRole = role.toLowerCase().includes("diakon persembahan") || 
-                                         role.toLowerCase().includes("diakones") || 
-                                         role.toLowerCase().includes("bwa");
-                
-                let person2 = "";
-                if (isMultiPersonRole && i + 1 < rows.length) {
-                    const nextRow = rows[i + 1];
-                    const nextRole = nextRow.c?.[0]?.v || "";
-                    // Check if next row is continuation (empty role)
-                    if (!nextRole || nextRole.trim() === "") {
-                        person2 = nextRow.c?.[columnIndex]?.v || "";
-                        if (person2) {
-                            skipNextRow = true;
-                        }
-                    }
-                }
+          // Skip empty roles
+          if (!role || !person) continue;
 
-                const item = document.createElement("li");
-                item.className = "list-group-item border-0 py-2 px-3";
-                
-                if (person2) {
-                    // Create item with two people displayed vertically
-                    item.innerHTML = `
+          // Handle Dor. PP/RT/Kesehatan based on Saturday of the month
+          let displayRole = role;
+          if (
+            role.toLowerCase().includes("dor") &&
+            (role.toLowerCase().includes("pp") ||
+              role.toLowerCase().includes("rt") ||
+              role.toLowerCase().includes("kesehatan"))
+          ) {
+            if (
+              saturdayNumber === 1 ||
+              saturdayNumber === 3 ||
+              saturdayNumber === 5
+            ) {
+              displayRole = "Dorongan PP";
+            } else if (saturdayNumber === 2) {
+              displayRole = "Rumah Tangga";
+            } else if (saturdayNumber === 4) {
+              displayRole = "Kesehatan";
+            }
+          }
+
+          // Check if this is a multi-person role (Diakon Persembahan or Diakones & BWA)
+          const isMultiPersonRole =
+            role.toLowerCase().includes("diakon persembahan") ||
+            role.toLowerCase().includes("diakones") ||
+            role.toLowerCase().includes("bwa");
+
+          let person2 = "";
+          if (isMultiPersonRole && i + 1 < rows.length) {
+            const nextRow = rows[i + 1];
+            const nextRole = nextRow.c?.[0]?.v || "";
+            // Check if next row is continuation (empty role)
+            if (!nextRole || nextRole.trim() === "") {
+              person2 = nextRow.c?.[columnIndex]?.v || "";
+              if (person2) {
+                skipNextRow = true;
+              }
+            }
+          }
+
+          const item = document.createElement("li");
+          item.className = "list-group-item border-0 py-2 px-3";
+
+          if (person2) {
+            // Create item with two people displayed vertically
+            item.innerHTML = `
                         <div class="flex justify-between" style="font-size: 0.9rem;">
                             <span class="font-semibold text-gray-700">${displayRole}</span>
                             <div class="text-right" style="text-align: right;">
@@ -348,150 +552,271 @@
                             </div>
                         </div>
                     `;
-                } else {
-                    item.innerHTML = `
+          } else {
+            item.innerHTML = `
                         <div class="flex justify-between items-center" style="font-size: 0.9rem;">
                             <span class="font-semibold text-gray-700">${displayRole}</span>
                             <span class="text-gray-900 text-right" style="text-align: right;">${person}</span>
                         </div>
                     `;
-                }
+          }
 
-                // Add to appropriate list
-                if (currentSection === "ssDewasa") {
-                    // Store SS data for custom ordering
-                    const roleKey = role.toLowerCase();
-                    ssData[roleKey] = { role: displayRole, person: person };
-                } else if (currentSection === "khotbah") {
-                    // Store khotbah data for custom ordering
-                    const roleKey = role.toLowerCase();
-                    khotbahData[roleKey] = { role: displayRole, person: person };
-                } else if (currentSection === "pelayanan") {
-                    pelayananList.appendChild(item);
-                } else if (currentSection === "diakonia") {
-                    diakoniaList.appendChild(item);
-                }
-            }
+          // Add to appropriate list
+          if (currentSection === "ssDewasa") {
+            // Store SS data for custom ordering
+            const roleKey = role.toLowerCase();
+            ssData[roleKey] = { role: displayRole, person: person };
+          } else if (currentSection === "khotbah") {
+            // Store khotbah data for custom ordering
+            const roleKey = role.toLowerCase();
+            khotbahData[roleKey] = { role: displayRole, person: person };
+          } else if (currentSection === "pelayanan") {
+            pelayananList.appendChild(item);
+          } else if (currentSection === "diakonia") {
+            diakoniaList.appendChild(item);
+          }
+        }
 
-            // Build Sekolah Sabat section in specific order
-            const createSSItem = (label, value) => {
-                const item = document.createElement("li");
-                item.className = "list-group-item border-0 py-2 px-3";
-                const isLaguSion = value.includes('LSEL') || value.includes('SDA Hymnal');
-                const valueColor = isLaguSion ? '#2e6ce8' : '#111827';
-                const labelColor = isLaguSion ? '#2e6ce8' : '';
-                item.innerHTML = `
+        // Build Sekolah Sabat section in specific order
+        const createSSItem = (label, value) => {
+          const item = document.createElement("li");
+          item.className = "list-group-item border-0 py-2 px-3";
+          const isLaguSion =
+            value.includes("LSEL") ||
+            value.includes("SDA Hymnal") ||
+            label.includes("Lagu");
+          const valueColor = isLaguSion ? "#2e6ce8" : "#111827";
+          const labelColor = isLaguSion ? "#2e6ce8" : "";
+          item.innerHTML = `
                     <div class="flex justify-between items-center" style="font-size: 0.9rem;">
                         <span class="font-semibold text-gray-700" style="color: ${labelColor};">${label}</span>
                         <span class="text-gray-900 text-right" style="color: ${valueColor}; text-align: right;">${value}</span>
                     </div>
                 `;
-                return item;
-            };
+          return item;
+        };
 
-            // Get persons from SS data
-            const doronganPP = ssData['dor. pp/rt/kesehatan']?.person || '';
-            
-            // Build SS section in specified order
-            // For next week (columnOffset = 1), show '-' for songs
-            const showSongs = columnOffset === 0;
-            const ssOrderedItems = [
-                { label: 'Sambutan Pemimpin', value: ssData['pemimpin']?.person || '-' },
-                { label: 'Lagu Pembuka', value: showSongs && laguBukaSSNum && laguSionMap[laguBukaSSNum] ? `LSEL no. ${laguBukaSSNum} - ${laguSionMap[laguBukaSSNum]}` : '-' },
-                { label: 'Ayat Inti & Doa Bertelut', value: ssData['ayat inti/doa buka ss']?.person || '-' },
-                { label: 'Berita Mission', value: ssData['berita mission']?.person || '-' },
-                { label: 'Kuis', value: ssData['kuis sekolah sabat']?.person || '-' },
-                { label: 'Diskusi Pelajaran SS', value: ssData['diskusi sekolah sabat']?.person || '-' },
-                { label: 'Lagu Pujian', value: ssData['lagu pujian']?.person || '-' },
-                { label: 'Dorongan PP', value: doronganPP || '-' },
-                { label: 'Lagu Penutup', value: showSongs ? (laguTutupSSNum && laguSionMap[laguTutupSSNum] ? `LSEL no. ${laguTutupSSNum} - ${laguSionMap[laguTutupSSNum]}` : 'SDA Hymnal 602 - Setialah Saudara') : '-' },
-                { label: 'Doa Penutup', value: doronganPP || '-' },
-                { label: 'Pengumuman', value: 'Dept. Komunikasi, Ketua Jemaat' }
-            ];
+        // Get persons from SS data
+        const doronganPP = ssData["dor. pp/rt/kesehatan"]?.person || "";
 
-            ssOrderedItems.forEach(item => {
-                // Show all rows with pre-defined values
-                ssDewaساList.appendChild(createSSItem(item.label, item.value));
-            });
+        // Build SS section in specified order
+        // For next week (columnOffset = 1), show '-' for songs
+        const showSongs = columnOffset === 0;
+        const ssOrderedItems = [
+          {
+            label: "Sambutan Pemimpin",
+            value: ssData["pemimpin"]?.person || "",
+          },
+          {
+            label: "Lagu Pembuka",
+            value:
+              showSongs && laguBukaSSNum && laguSionMap[laguBukaSSNum]
+                ? `LSEL no. ${laguBukaSSNum} - ${laguSionMap[laguBukaSSNum]}`
+                : "",
+          },
+          {
+            label: "Ayat Inti & Doa Bertelut",
+            value: ssData["ayat inti/doa buka ss"]?.person || "",
+          },
+          {
+            label: "Berita Mission",
+            value: ssData["berita mission"]?.person || "",
+          },
+          { label: "Kuis", value: ssData["kuis sekolah sabat"]?.person || "" },
+          {
+            label: "Diskusi Pelajaran SS",
+            value: ssData["diskusi sekolah sabat"]?.person || "",
+          },
+          { label: "Lagu Pujian", value: ssData["lagu pujian"]?.person || "" },
+          { label: "Dorongan PP", value: doronganPP || "" },
+          {
+            label: "Lagu Penutup",
+            value: showSongs
+              ? laguTutupSSNum && laguSionMap[laguTutupSSNum]
+                ? `LSEL no. ${laguTutupSSNum} - ${laguSionMap[laguTutupSSNum]}`
+                : "SDA Hymnal 602 - Setialah Saudara"
+              : "",
+          },
+          { label: "Doa Penutup", value: doronganPP || "" },
+          { label: "Pengumuman", value: "Dept. Komunikasi, Ketua Jemaat" },
+        ];
 
-            // Build khotbah section in specific order
-            const createKhotbahItem = (label, value, middleValue = null) => {
-                const item = document.createElement("li");
-                item.className = "list-group-item border-0 py-2 px-3";
-                const isLaguSion = value.includes('LSEL') || value.includes('Instrumental');
-                const valueColor = isLaguSion ? '#2e6ce8' : '#111827';
-                const labelColor = isLaguSion ? '#2e6ce8' : '';
-                
-                if (middleValue) {
-                    // Three column layout
-                    item.innerHTML = `
+        ssOrderedItems.forEach((item) => {
+          // Show all rows with pre-defined values
+          ssDewaساList.appendChild(createSSItem(item.label, item.value));
+        });
+
+        // Build khotbah section in specific order
+        const createKhotbahItem = (label, value, middleValue = null) => {
+          const item = document.createElement("li");
+          item.className = "list-group-item border-0 py-2 px-3";
+          const isLaguSion =
+            value.includes("LSEL") ||
+            value.includes("Instrumental") ||
+            label.includes("Lagu");
+          const valueColor = isLaguSion ? "#2e6ce8" : "#111827";
+          const labelColor = isLaguSion ? "#2e6ce8" : "";
+
+          if (middleValue) {
+            // Three column layout
+            item.innerHTML = `
                         <div class="flex justify-between items-start" style="font-size: 0.9rem; gap: 1rem;">
                             <span class="font-semibold text-gray-700" style="color: ${labelColor}; flex: 0 0 auto;">${label}</span>
                             <span class="text-gray-700 text-center" style="flex: 1 1 auto; font-style: italic;">${middleValue}</span>
                             <span class="text-gray-900 text-right" style="color: ${valueColor}; text-align: right; flex: 0 0 auto;">${value}</span>
                         </div>
                     `;
-                } else {
-                    // Two column layout (original)
-                    item.innerHTML = `
+          } else {
+            // Two column layout (original)
+            item.innerHTML = `
                         <div class="flex justify-between items-center" style="font-size: 0.9rem;">
                             <span class="font-semibold text-gray-700" style="color: ${labelColor};">${label}</span>
                             <span class="text-gray-900 text-right" style="color: ${valueColor}; text-align: right;">${value}</span>
                         </div>
                     `;
-                }
-                return item;
-            };
+          }
+          return item;
+        };
 
-            // Get persons from khotbah data
-            const bacaanPersembahan = khotbahData['bacaan persembahan']?.person || '';
-            const pembicara = khotbahData['pembicara']?.person || '';
-            const ayatBersahutan = khotbahData['ayat bersahutan & inti']?.person || '';
-            const khotbahTitle = khotbahData['khotbah']?.person || '';
-            
-            // Build in specified order
-            // For next week (columnOffset = 1), show '-' for songs and Instrumental
-            const orderedItems = [
-                { label: 'Lagu Partisipan Khotbah', value: showSongs && laguSionMap[421] ? `LSEL no. 421 - ${laguSionMap[421]}` : '-', middleValue: null },
-                { label: 'Lagu Pembuka', value: showSongs && laguBukaNum && laguSionMap[laguBukaNum] ? `LSEL no. ${laguBukaNum} - ${laguSionMap[laguBukaNum]}` : '-', middleValue: null },
-                { label: 'Doa Syafaat', value: khotbahData['doa syafaat']?.person || '-', middleValue: null },
-                { label: 'Bacaan Persembahan', value: bacaanPersembahan || '-', middleValue: null },
-                { label: 'Lagu Persembahan', value: showSongs ? 'Instrumental' : '-', middleValue: null },
-                { label: 'Lagu Sambutan', value: showSongs && laguSionMap[21] ? `LSEL no. 21 - ${laguSionMap[21]}` : '-', middleValue: null },
-                { label: 'Doa Persembahan', value: bacaanPersembahan || '-', middleValue: null },
-                { label: 'Lagu Pujian', value: khotbahData['lagu pujian']?.person || khotbahData['lagu pujian 1']?.person || '-', middleValue: null },
-                { label: 'Cerita Anak', value: khotbahData['cerita anak']?.person || '-', middleValue: null },
-                { label: 'Lagu Pujian', value: khotbahData['lagu pujian 2']?.person || '-', middleValue: null },
-                { label: 'Ayat Bersahutan', value: ayatBersahutan || '-', middleValue: ayatBersahutanText || '-' },
-                { label: 'Ayat Inti', value: ayatBersahutan || '-', middleValue: ayatInti || '-' },
-                { label: 'Lagu Sambutan Khotbah', value: showSongs && laguSionMap[524] ? `LSEL no. 524 - ${laguSionMap[524]}` : '-', middleValue: null },
-                { label: 'Doa Pendek', value: pembicara || '-', middleValue: null },
-                { label: 'Khotbah', value: khotbahTitle || pembicara || '-', middleValue: judulKhotbah || '-' },
-                { label: 'Lagu Penutup', value: showSongs && laguSionMap[302] ? `LSEL no. 302 - ${laguSionMap[302]}` : '-', middleValue: null },
-                { label: 'Doa Penutup', value: pembicara || '-', middleValue: null },
-                { label: 'Lagu Sambutan', value: showSongs && laguSionMap[168] ? `LSEL no. 168 - ${laguSionMap[168]}` : '-', middleValue: null }
-            ];
+        // Get persons from khotbah data
+        const bacaanPersembahan =
+          khotbahData["bacaan persembahan"]?.person || "";
+        const pembicara = khotbahData["pembicara"]?.person || "";
+        const ayatBersahutan =
+          khotbahData["ayat bersahutan & inti"]?.person || "";
+        const khotbahTitle = khotbahData["khotbah"]?.person || "";
 
-            orderedItems.forEach(item => {
-                // Show all rows with pre-defined values
-                khotbahList.appendChild(createKhotbahItem(item.label, item.value, item.middleValue));
-            });
-        }
-        
-        // Navigation buttons - toggle between current week (0) and next week (1)
-        document.getElementById('nextWeek').addEventListener('click', () => {
-            columnOffset = 1;
-            localStorage.setItem('columnOffset', '1');
-            renderSchedule();
+        // Build in specified order
+        // For next week (columnOffset = 1), show '-' for songs and Instrumental
+        const orderedItems = [
+          {
+            label: "Lagu Partisipan Khotbah",
+            value:
+              showSongs && laguSionMap[421]
+                ? `LSEL no. 421 - ${laguSionMap[421]}`
+                : "",
+            middleValue: null,
+          },
+          {
+            label: "Lagu Pembuka",
+            value:
+              showSongs && laguBukaNum && laguSionMap[laguBukaNum]
+                ? `LSEL no. ${laguBukaNum} - ${laguSionMap[laguBukaNum]}`
+                : "",
+            middleValue: null,
+          },
+          {
+            label: "Doa Syafaat",
+            value: khotbahData["doa syafaat"]?.person || "",
+            middleValue: null,
+          },
+          {
+            label: "Bacaan Persembahan",
+            value: bacaanPersembahan || "",
+            middleValue: null,
+          },
+          {
+            label: "Lagu Persembahan",
+            value: showSongs ? "Instrumental" : "",
+            middleValue: null,
+          },
+          {
+            label: "Lagu Sambutan",
+            value:
+              showSongs && laguSionMap[21]
+                ? `LSEL no. 21 - ${laguSionMap[21]}`
+                : "",
+            middleValue: null,
+          },
+          {
+            label: "Doa Persembahan",
+            value: bacaanPersembahan || "",
+            middleValue: null,
+          },
+          {
+            label: "Lagu Pujian",
+            value:
+              khotbahData["lagu pujian"]?.person ||
+              khotbahData["lagu pujian 1"]?.person ||
+              "",
+            middleValue: null,
+          },
+          {
+            label: "Cerita Anak",
+            value: khotbahData["cerita anak"]?.person || "",
+            middleValue: null,
+          },
+          {
+            label: "Lagu Pujian",
+            value: khotbahData["lagu pujian 2"]?.person || "",
+            middleValue: null,
+          },
+          {
+            label: "Ayat Bersahutan",
+            value: ayatBersahutan || "",
+            middleValue: showSongs ? ayatBersahutanText || "" : "",
+          },
+          {
+            label: "Ayat Inti",
+            value: ayatBersahutan || "",
+            middleValue: showSongs ? ayatInti || "" : "",
+          },
+          {
+            label: "Lagu Sambutan Khotbah",
+            value:
+              showSongs && laguSionMap[524]
+                ? `LSEL no. 524 - ${laguSionMap[524]}`
+                : "",
+            middleValue: null,
+          },
+          { label: "Doa Pendek", value: pembicara || "", middleValue: null },
+          {
+            label: "Khotbah",
+            value: khotbahTitle || pembicara || "",
+            middleValue: showSongs ? judulKhotbah || "" : "",
+          },
+          {
+            label: "Lagu Penutup",
+            value:
+              showSongs && laguSionMap[302]
+                ? `LSEL no. 302 - ${laguSionMap[302]}`
+                : "",
+            middleValue: null,
+          },
+          { label: "Doa Penutup", value: pembicara || "", middleValue: null },
+          {
+            label: "Lagu Sambutan",
+            value:
+              showSongs && laguSionMap[168]
+                ? `LSEL no. 168 - ${laguSionMap[168]}`
+                : "",
+            middleValue: null,
+          },
+        ];
+
+        orderedItems.forEach((item) => {
+          // Show all rows with pre-defined values
+          khotbahList.appendChild(
+            createKhotbahItem(item.label, item.value, item.middleValue),
+          );
         });
-        
-        document.getElementById('thisWeek').addEventListener('click', () => {
-            columnOffset = 0;
-            localStorage.setItem('columnOffset', '0');
-            renderSchedule();
-        });
+      }
+
+      // Navigation buttons - toggle between current week (0) and next week (1)
+      document.getElementById("nextWeek").addEventListener("click", () => {
+        columnOffset = 1;
+        localStorage.setItem("columnOffset", "1");
+        renderSchedule();
+      });
+
+      document.getElementById("thisWeek").addEventListener("click", () => {
+        columnOffset = 0;
+        localStorage.setItem("columnOffset", "0");
+        renderSchedule();
+      });
     </script>
 
-</body>
-
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>

@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ulang Tahun - GMAHK BSD</title>
+
+    <!-- Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <style>
+      @keyframes fadeInContent {
+        0% {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .content-animate {
+        opacity: 0;
+        animation: fadeInContent 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards;
+      }
+
+      .delayed-content {
+        opacity: 0;
+        animation: fadeInContent 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.6s forwards;
+      }
+
+      .navbar {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+
+      .nav-link:hover {
+        color: #2e6ce8 !important;
+      }
+
+      .birthday-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .birthday-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+
+  <body class="bg-white">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+      <div class="container">
+        <a class="navbar-brand" href="#">
+          <img
+            src="GMAHK BSD.png"
+            alt="GMAHK BSD"
+            style="height: 40px;"
+          />
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="index.html" style="color: #6c757d;">
+                Kertas Acara
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="ulang-tahun.html" style="color: #2e6ce8; font-weight: 500;">
+                Ulang Tahun
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container py-3 py-md-5 px-3">
+      <div class="text-center mb-4">
+        <h1 class="font-bold content-animate" style="font-size: 1.75rem; color: #2e6ce8;">
+          <i class="bi bi-cake2"></i> Ulang Tahun Minggu Ini
+        </h1>
+        <p class="text-gray-600 content-animate" style="font-size: 1rem; font-weight: 500;" id="birthdayCount">
+          <span class="spinner-border spinner-border-sm" role="status"></span> Memuat...
+        </p>
+        <p class="text-gray-600 content-animate" style="font-size: 0.9rem;" id="weekRange">
+          <span class="spinner-border spinner-border-sm" role="status"></span> Memuat...
+        </p>
+      </div>
+
+      <div id="birthdayContainer" class="delayed-content">
+        <div class="text-center py-5">
+          <div class="spinner-border" style="color: #2e6ce8;" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-3 text-gray-600">Memuat data ulang tahun...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      const SHEET_ID = "1TM1e4w1mhgZvXo5JBcihACXPgrmFBKX91_qAp6wbU_Q";
+      const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+
+      // Get current week range (Sunday to Saturday)
+      function getCurrentWeekRange() {
+        const today = new Date();
+        const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
+
+        // Calculate Sunday of this week
+        const sunday = new Date(today);
+        sunday.setDate(today.getDate() - dayOfWeek);
+        sunday.setHours(0, 0, 0, 0);
+
+        // Calculate Saturday of this week
+        const saturday = new Date(sunday);
+        saturday.setDate(sunday.getDate() + 6);
+        saturday.setHours(23, 59, 59, 999);
+
+        return { sunday, saturday };
+      }
+
+      // Format date as "DD MMM"
+      function formatDateShort(date) {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const day = date.getDate();
+        const month = months[date.getMonth()];
+        return `${day} ${month}`;
+      }
+
+      // Format date as "DD MMMM YYYY"
+      function formatDateLong(date) {
+        const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
+                       'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        const day = date.getDate();
+        const month = months[date.getMonth()];
+        const year = date.getFullYear();
+        return `${day} ${month} ${year}`;
+      }
+
+      // Parse birthday from Google Sheets Date string format
+      function parseBirthday(birthdayData) {
+        if (!birthdayData) return null;
+        
+        // Google Sheets returns dates as strings like "Date(1998,0,27)"
+        if (typeof birthdayData === 'string' && birthdayData.startsWith('Date(')) {
+          // Extract the values: "Date(1998,0,27)" -> [1998, 0, 27]
+          const match = birthdayData.match(/Date\((\d+),(\d+),(\d+)\)/);
+          if (match) {
+            const year = parseInt(match[1]);
+            const month = parseInt(match[2]); // Already 0-indexed from Google Sheets
+            const day = parseInt(match[3]);
+            
+            return { day, month, year };
+          }
+        }
+        
+        return null;
+      }
+
+      // Check if birthday falls in current week (only check month and day, ignore year)
+      function isBirthdayThisWeek(birthday, weekRange) {
+        if (!birthday) return false;
+        
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        
+        // Create birthday date for this year using only month and day
+        const birthdayThisYear = new Date(currentYear, birthday.month, birthday.day);
+        
+        console.log(`Checking: month=${birthday.month}, day=${birthday.day}, birthdayThisYear=${birthdayThisYear}, isInRange=${birthdayThisYear >= weekRange.sunday && birthdayThisYear <= weekRange.saturday}`);
+        
+        return birthdayThisYear >= weekRange.sunday && birthdayThisYear <= weekRange.saturday;
+      }
+
+      // Calculate age
+      function calculateAge(birthday) {
+        if (!birthday) return null;
+        const today = new Date();
+        const birthDate = new Date(birthday.year, birthday.month, birthday.day);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+        }
+        return age;
+      }
+
+      // Get day name in Indonesian
+      function getDayName(date) {
+        const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+        return days[date.getDay()];
+      }
+
+      // Fetch and display birthdays
+      fetch(SHEET_URL)
+        .then(res => res.text())
+        .then(text => {
+          const json = JSON.parse(text.substring(47, text.length - 2));
+          const rows = json.table.rows;
+
+          console.log('Total rows fetched:', rows.length);
+          console.log('First 5 rows:', rows.slice(0, 5));
+
+          const weekRange = getCurrentWeekRange();
+          console.log('Week range:', weekRange);
+          
+          // Update week range display
+          document.getElementById('weekRange').textContent = 
+            `${formatDateLong(weekRange.sunday)} - ${formatDateLong(weekRange.saturday)}`;
+          
+          // Initialize birthday count display
+          document.getElementById('birthdayCount').textContent = 'Tidak ada yang berulang tahun minggu ini...';
+
+          const birthdays = [];
+
+          // Skip header row (index 0) and process data rows
+          for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            if (!row.c) continue;
+
+            const no = row.c[0]?.v;
+            const nama = row.c[1]?.v;
+            const tanggalLahir = row.c[2]?.v;
+
+            if (i <= 20) {
+              console.log(`Row ${i}: No=${no}, Nama=${nama}, Tanggal=${tanggalLahir}`);
+              console.log('  Type:', typeof tanggalLahir);
+              console.log('  Value:', tanggalLahir);
+            }
+
+            if (!nama || !tanggalLahir) continue;
+
+            const birthday = parseBirthday(tanggalLahir);
+            
+            if (i <= 20 && birthday) {
+              console.log(`  Parsed birthday:`, birthday);
+              console.log(`  Birthday this year: ${new Date(2026, birthday.month, birthday.day)}`);
+              console.log(`  Is this week?`, isBirthdayThisWeek(birthday, weekRange));
+            }
+            
+            if (isBirthdayThisWeek(birthday, weekRange)) {
+              const age = calculateAge(birthday);
+              const birthdayDate = new Date(new Date().getFullYear(), birthday.month, birthday.day);
+              
+              birthdays.push({
+                nama,
+                tanggalLahir,
+                birthday,
+                age,
+                birthdayDate,
+                dayName: getDayName(birthdayDate)
+              });
+            }
+          }
+
+          // Sort by date
+          birthdays.sort((a, b) => a.birthdayDate - b.birthdayDate);
+
+          // Console log the birthday list
+          console.log('Birthday List This Week:', birthdays);
+          console.log(`Total birthdays: ${birthdays.length}`);
+
+          // Update birthday count
+          document.getElementById('birthdayCount').textContent = 
+            `${birthdays.length} jemaat berulang tahun minggu ini`;
+          
+          // Display birthdays
+          const container = document.getElementById('birthdayContainer');
+          
+          if (birthdays.length === 0) {
+            container.innerHTML = `
+              <div class="text-center py-5">
+                <i class="bi bi-emoji-frown" style="font-size: 3rem; color: #6c757d;"></i>
+                <p class="mt-3 text-gray-600">Tidak ada ulang tahun minggu ini.</p>
+              </div>
+            `;
+          } else {
+            let html = '<div class="row g-3">';
+            
+            birthdays.forEach(person => {
+              const dateStr = formatDateShort(person.birthdayDate);
+              
+              html += `
+                <div class="col-12 col-md-6 col-lg-4">
+                  <div class="card birthday-card h-100" style="border-left: 4px solid #2e6ce8;">
+                    <div class="card-body">
+                      <h5 class="card-title mb-2" style="font-size: 1.1rem; color: #2e6ce8;">
+                        ${person.nama}
+                      </h5>
+                      <p class="card-text mb-0 text-muted" style="font-size: 0.9rem;">
+                        <i class="bi bi-calendar-event"></i> ${person.dayName}, ${dateStr}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              `;
+            });
+            
+            html += '</div>';
+            
+            container.innerHTML = html;
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById('birthdayContainer').innerHTML = `
+            <div class="text-center py-5">
+              <i class="bi bi-exclamation-triangle" style="font-size: 3rem; color: #dc3545;"></i>
+              <p class="mt-3 text-danger">Gagal memuat data ulang tahun.</p>
+            </div>
+          `;
+        });
+    </script>
+  </body>
+</html>
