@@ -272,6 +272,16 @@
         return days[date.getDay()];
       }
 
+      // Reverse name order (from "Surname Firstname" to "Firstname Surname")
+      function reverseName(name) {
+        if (!name) return name;
+        const parts = name.trim().split(" ");
+        if (parts.length === 1) return name; // Single name, return as-is
+        // Move first word to the end, keep rest in order
+        const [first, ...rest] = parts;
+        return [...rest, first].join(" ");
+      }
+
       // Fetch and display birthdays
       fetch(SHEET_URL)
         .then((res) => res.text())
@@ -297,7 +307,7 @@
             if (!row.c) continue;
 
             const no = row.c[0]?.v;
-            const nama = row.c[1]?.v;
+            const nama = reverseName(row.c[1]?.v);
             const tanggalLahir = row.c[2]?.v;
 
             if (!nama || !tanggalLahir) continue;
