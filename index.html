@@ -185,7 +185,7 @@
 
       // Get this week's Saturday (or next Saturday if today is Sunday)
       // Track which column offset to use (0 = this week, 1 = next week)
-      let columnOffset = parseInt(localStorage.getItem("columnOffset") || "0");
+      let columnOffset = 0;
 
       function getThisWeeksSaturday() {
         const today = new Date();
@@ -768,13 +768,11 @@
       // Navigation buttons - toggle between current week (0) and next week (1)
       document.getElementById("nextWeek").addEventListener("click", () => {
         columnOffset = 1;
-        localStorage.setItem("columnOffset", "1");
         renderSchedule();
       });
 
       document.getElementById("thisWeek").addEventListener("click", () => {
         columnOffset = 0;
-        localStorage.setItem("columnOffset", "0");
         renderSchedule();
       });
     </script>
