@@ -306,7 +306,7 @@
               laguBukaSSNum = row.c[9]?.v; // Column 9 has SS song number (478)
             } else if (label.toLowerCase() === "lagu tutup") {
               laguTutupNum = row.c[2]?.v; // Column 2 has khotbah song number (302)
-              // SS closing song is hardcoded per user request
+              laguTutupSSNum = row.c[9]?.v; // Column 9 has SS closing song number
             } else if (label.toLowerCase() === "judul khotbah") {
               judulKhotbah = row.c[2]?.v; // Column 3 has sermon title
             } else if (label.toLowerCase() === "ayat inti") {
@@ -315,9 +315,6 @@
               ayatBersahutanText = row.c[2]?.v; // Column 3 has responsive verse
             }
           }
-
-          // Hardcode SS closing song as per user requirement
-          laguTutupSSNum = null; // Will use fallback text "SDA Hymnal 602 - Setialah Saudara"
 
           // Parse and cache the main schedule data
           const json = JSON.parse(
@@ -594,11 +591,10 @@
           { label: "Dorongan PP", value: doronganPP || "" },
           {
             label: "Lagu Penutup",
-            value: showSongs
-              ? laguTutupSSNum && laguSionMap[laguTutupSSNum]
+            value:
+              showSongs && laguTutupSSNum && laguSionMap[laguTutupSSNum]
                 ? `LSEL no. ${laguTutupSSNum} - ${laguSionMap[laguTutupSSNum]}`
-                : "SDA Hymnal 602 - Setialah Saudara"
-              : "",
+                : "",
           },
           { label: "Doa Penutup", value: doronganPP || "" },
           { label: "Pengumuman", value: "Dept. Komunikasi, Ketua Jemaat" },
